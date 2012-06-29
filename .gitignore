@@ -1,3 +1,6 @@
 /ebin/
 *.beam
 *.so
+*.swp
+*.o
+/.eunit/
