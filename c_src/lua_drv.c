@@ -19,7 +19,7 @@ static ErlDrvEntry lua_driver_entry = {
     NULL,                             /* output */
     NULL,                             /* ready_input */
     NULL,                             /* ready_output */
-    "lua_drv",                        /* the name of the driver */
+    "liberlua",                        /* the name of the driver */
     NULL,                             /* finish */
     NULL,                             /* handle */
     NULL,                             /* control */
