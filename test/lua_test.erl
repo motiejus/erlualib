@@ -16,17 +16,20 @@ string_test() -> push_to_helper("testing", pushstring, tolstring).
 
 call_test() ->
     {ok, L} = lua:new_state(),
-    ?assertMatch(ok, lua:getfield(L, global, "type")),
-    ?assertMatch(ok, lua:pushnumber(L, 1)),
-    ?assertMatch(ok, lua:call(L, 1, 1)),
-    ?assertMatch({ok, "number"}, lua:tolstring(L, 1)).
+    ?assertEqual(ok, lua:getfield(L, global, "type")),
+    ?assertEqual(function, lua:type(L, 1)),
+    ?assertEqual(ok, lua:pushnumber(L, 1)),
+    ?assertEqual(ok, lua:call(L, 1, 1)),
+    ?assertEqual({ok, "number"}, lua:tolstring(L, 1)),
+    lua:close(L).
     
 set_get_global_test() ->
     {ok, L} = lua:new_state(),
     ?assertMatch(ok, lua:pushnumber(L, 23)),
     ?assertMatch(ok, lua:setfield(L, global, "foo")),
     ?assertMatch(ok, lua:getfield(L, global, "foo")),
-    ?assertMatch({ok, 23}, lua:tonumber(L, 1)).
+    ?assertMatch({ok, 23}, lua:tonumber(L, 1)),
+    lua:close(L).
 
 push_to_helper(Val, Push, To) ->
     {ok, L} = lua:new_state(),
