@@ -24,12 +24,8 @@ call(L, Func, Args, Returns) when is_list(Args) ->
     list_to_tuple(lists:map(fun(I) ->
             R = case lua:type(L, -I) of
                 nil -> nil;
-                number ->
-                    {ok, N} = lua:tonumber(L, -I),
-                    N;
-                string ->
-                    {ok, S} = lua:tolstring(L, -I),
-                    S
+                number -> lua:tonumber(L, -I);
+                string -> lua:tolstring(L, -I)
             end,
             lua:remove(L, -I),
             R

@@ -68,7 +68,7 @@ getglobal(L, Name) ->
     command(L, {?ERL_LUA_GETGLOBAL, Name}),
     receive_simple_response().
 
--spec gettop(lua()) -> {ok, abs_index()}.
+-spec gettop(lua()) -> abs_index().
 gettop(L) ->
     command(L, {?ERL_LUA_GETTOP}),
     receive_valued_response().
@@ -120,32 +120,30 @@ setglobal(L, Name) ->
     command(L, {?ERL_LUA_SETGLOBAL, Name}),
     receive_simple_response().
 
--spec toboolean(lua(), index()) -> {ok, boolean()}.
+-spec toboolean(lua(), index()) -> boolean().
 toboolean(L, Index) ->
     command(L, {?ERL_LUA_TOBOOLEAN, Index}),
     receive_valued_response().
 
--spec tointeger(lua(), index()) -> {ok, integer()}.
+-spec tointeger(lua(), index()) -> integer().
 tointeger(L, Index) ->
     command(L, {?ERL_LUA_TOINTEGER, Index}),
     receive_valued_response().
 
--spec tolstring(lua(), index()) -> {ok, binary()}.
+-spec tolstring(lua(), index()) -> binary().
 tolstring(L, Index) ->
     command(L, {?ERL_LUA_TOLSTRING, Index}),
     receive_valued_response().
 
--spec tonumber(lua(), index()) -> {ok, number()}.
+-spec tonumber(lua(), index()) -> number().
 tonumber(L, Index) ->
     command(L, {?ERL_LUA_TONUMBER, Index}),
-    {ok, Value} = receive_valued_response(),
-    {ok, binary_to_term(Value)}.
+    binary_to_term(receive_valued_response()).
 
 -spec type(lua(), index()) -> lua_type().
 type(L, Index) ->
     command(L, {?ERL_LUA_TYPE, Index}),
-    {ok, Ret} = receive_valued_response(),
-    lua_type_to_atom(Ret).
+    lua_type_to_atom(receive_valued_response()).
 
 command(#lua{port=Port}, Data) ->
     port_command(Port, term_to_binary(Data)).
@@ -167,13 +165,11 @@ receive_simple_response() ->
 receive_valued_response() ->
     receive
         {ok, Str} ->
-            {ok, Str};
-        error ->
-            {error, lua_error};
+            Str;
         Other ->
-            {other, Other}
+            error({lua_error, Other})
     after ?STD_TIMEOUT ->
-        {error, timeout}
+            error(timeout)
     end.
 
 -spec lua_type_to_atom(non_neg_integer()) -> lua_type().
