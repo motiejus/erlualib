@@ -34,4 +34,4 @@ call(L, Func, Args, Returns) when is_list(Args) ->
 push(L, Value) when is_number(Value) ->
     lua:pushnumber(L, Value);
 push(L, Value) when is_list(Value) ->
-    lua:pushstring(L, Value).
+    lua:pushlstring(L, list_to_binary(Value)).
