@@ -40,6 +40,13 @@ set_get_field_test() ->
     ?assertEqual(ok, lua:getfield(L, 1, "foo")),
     ?assertEqual({ok, true}, lua:toboolean(L, 2)).
 
+concat_test() ->
+    {ok, L} = lua:new_state(),
+    lua:pushstring(L, "ya"),
+    lua:pushstring(L, "dda"),
+    ?assertEqual(ok, lua:concat(L, 2)),
+    ?assertEqual({ok, "yadda"}, lua:tolstring(L, 1)).
+
 call_test() ->
     {ok, L} = lua:new_state(),
     ?assertEqual(ok, lua:getfield(L, global, "type")),
