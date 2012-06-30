@@ -192,16 +192,16 @@ erl_lua_toboolean(lua_drv_t *driver_data, char *buf, int index)
 {
   long i;
   int res;
-  ErlDrvTermData spec[2];
-  spec[0] = ERL_DRV_ATOM;
   
   ei_decode_long(buf, &index, &i);
   
   res = lua_toboolean(driver_data->L, i);
-  if (res)
-    spec[1] = driver_mk_atom("true");
-  else
-    spec[1] = driver_mk_atom("false");
+
+  ErlDrvTermData spec[] = {
+        ERL_DRV_ATOM,   ATOM_OK,
+        ERL_DRV_ATOM, driver_mk_atom(res ? "true" : "false"),
+        ERL_DRV_TUPLE,  2
+  };
   driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
 }
 

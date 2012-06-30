@@ -13,6 +13,7 @@ big_float_number_test() -> push_to_helper(5000000000.234, pushnumber, tonumber).
 big_neg_number_test() -> push_to_helper(-5000000000, pushnumber, tonumber).
 big_neg_float_test() -> push_to_helper(-5000000000.234, pushnumber, tonumber).
 string_test() -> push_to_helper("testing", pushstring, tolstring).
+bool_test() -> push_to_helper(false, pushboolean, toboolean).
 
 nil_type_test() -> type_test_helper(pushnil, nil).
 boolean_type_test() -> type_test_helper(true, pushboolean, boolean).
