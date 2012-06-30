@@ -251,8 +251,6 @@ erl_lua_tolstring(lua_drv_t *driver_data, char *buf, int index)
   driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
 }
 
-
-/* TODO: return a binary instead of a list that is then converted to a binary */
 void
 erl_lua_tonumber(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -287,12 +285,11 @@ erl_lua_tonumber(lua_drv_t *driver_data, char *buf, int index)
     
   ErlDrvTermData spec[] = {
         ERL_DRV_ATOM,   ATOM_OK,
-        ERL_DRV_STRING, (ErlDrvTermData) eibuf, size,
+        ERL_DRV_BUF2BINARY, (ErlDrvTermData) eibuf, size,
         ERL_DRV_TUPLE,  2
   };
   driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
   free(eibuf);
-  //driver_free_binary(bin);
 }
 
 void

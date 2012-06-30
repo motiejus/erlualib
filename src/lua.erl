@@ -139,8 +139,7 @@ tolstring(L, Index) ->
 tonumber(L, Index) ->
     command(L, {?ERL_LUA_TONUMBER, Index}),
     {ok, Value} = receive_valued_response(),
-    Value2 = list_to_binary(Value),
-    {ok, binary_to_term(Value2)}.
+    {ok, binary_to_term(Value)}.
 
 -spec type(lua(), index()) -> lua_type().
 type(L, Index) ->
