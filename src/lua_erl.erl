@@ -23,12 +23,11 @@ call(L, Func, Args, Returns) when is_list(Args) ->
     lua:call(L, length(Args), Returns),
     list_to_tuple(lists:map(fun(I) ->
             R = case lua:type(L, -I) of
-                {ok, ?LUA_TNIL} ->
-                    nil;
-                {ok, ?LUA_TNUMBER} ->
+                nil -> nil;
+                number ->
                     {ok, N} = lua:tonumber(L, -I),
                     N;
-                {ok, ?LUA_TSTRING} ->
+                string ->
                     {ok, S} = lua:tolstring(L, -I),
                     S
             end,
