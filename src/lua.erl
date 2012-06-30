@@ -24,6 +24,12 @@
 -include("lua.hrl").
 -include("lua_api.hrl").
 
+-type lua() :: #lua{}.
+-type index() :: pos_integer() | neg_integer().
+
+-type lua_type() :: nil | boolean | light_user_data | number |
+        string | table | function | user_data | thread | unknown.
+
 new_state() ->
     {ok, lua_driver:open()}.
     
