@@ -2,7 +2,7 @@ Erl-Lua is a library for embedding Lua into Erlang. It provides a simple
 interface that is very similar to the Lua C API. In the future it will also
 include a higher level API to simplify things further.
 
-This is a fork of Ray Morgan's Erl-Lua library[1] with:
+This is a fork of Ray Morgan's [Erl-Lua] library with:
 
 * Rebar
 * Much better test coverage (all API except for boilerplate is covered)
@@ -13,7 +13,7 @@ This is a fork of Ray Morgan's Erl-Lua library[1] with:
 
 Some major features are planned:
 * Extend lua_erl:call/4 to handle recursive arguments and PropErly test it
-* [Erlang behaviours in Lua](http://m.jakstys.lt/tech/2012/06/erlang-behaviours-in-lua/)
+* [Erlang behaviours in Lua]
 
 Example:
 
@@ -54,3 +54,6 @@ If the number of returned values is 1, the argument can be left off.. therefore 
 
     lua_erl:call(L, type, [23]).
     lua_erl:call(L, add, [2, 3, 4]).
+
+[Erl-Lua]: https://github.com/raycmorgan/erl-lua/
+[Erlang behaviours in Lua]: http://m.jakstys.lt/tech/2012/06/erlang-behaviours-in-lua/
