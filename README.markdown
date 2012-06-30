@@ -1,12 +1,23 @@
-Erl-Lua is a library for embedding Lua into Erlang. It provides a simple interface that is very similar to the Lua C API. In the future it will also include a higher level API to simplify things further.
+Erl-Lua is a library for embedding Lua into Erlang. It provides a simple
+interface that is very similar to the Lua C API. In the future it will also
+include a higher level API to simplify things further.
 
-WARNING: This is definitely not fully tested. Still a bunch of work to be done. If you are careful though, it should be pretty stable (no promises though).
+This is a fork of Ray Morgan's Erl-Lua library[1] with:
+
+* Bugfixes
+* Much better test coverage (all API except for boilerplate is covered)
+* Some new commands (lua_newtable, lua_pushlstring)
+* Strings in Lua are Binaries in Erlang (instead of lists of numbers)
+
+Some major features are planned:
+* Extend lua_erl:call/4 to handle recursive arguments and PropErly test it
+* [Erlang behaviours in Lua](http://m.jakstys.lt/tech/2012/06/erlang-behaviours-in-lua/)
 
 Example:
 
     {ok, L} = lua:new_state().
     lua:getfield(L, global, "print").
-    lua:pushstring(L, "Hello from Lua!").
+    lua:pushlstring(L, <<"Hello from Lua!">>).
     lua:call(L, 1, 0).
     % (Lua) => Hello from Lua!
 
