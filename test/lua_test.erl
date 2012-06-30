@@ -12,13 +12,13 @@ big_number_test() -> push_to_helper(5000000000, pushnumber, tonumber).
 big_float_number_test() -> push_to_helper(5000000000.234, pushnumber, tonumber).
 big_neg_number_test() -> push_to_helper(-5000000000, pushnumber, tonumber).
 big_neg_float_test() -> push_to_helper(-5000000000.234, pushnumber, tonumber).
-string_test() -> push_to_helper("testing", pushstring, tolstring).
+string_test() -> push_to_helper(<<"testing">>, pushlstring, tolstring).
 bool_test() -> push_to_helper(false, pushboolean, toboolean).
 
 nil_type_test() -> type_test_helper(pushnil, nil).
 boolean_type_test() -> type_test_helper(true, pushboolean, boolean).
 num_type_test() -> type_test_helper(1, pushinteger, number).
-string_type_test() -> type_test_helper("foo", pushstring, string).
+string_type_test() -> type_test_helper(<<"foo">>, pushlstring, string).
 table_type_test() -> type_test_helper(newtable, table).
 
 remove_test() ->
@@ -42,10 +42,10 @@ set_get_field_test() ->
 
 concat_test() ->
     {ok, L} = lua:new_state(),
-    lua:pushstring(L, "ya"),
-    lua:pushstring(L, "dda"),
+    lua:pushlstring(L, <<"ya">>),
+    lua:pushlstring(L, <<"dda">>),
     ?assertEqual(ok, lua:concat(L, 2)),
-    ?assertEqual({ok, "yadda"}, lua:tolstring(L, 1)).
+    ?assertEqual({ok, <<"yadda">>}, lua:tolstring(L, 1)).
 
 call_test() ->
     {ok, L} = lua:new_state(),
@@ -53,7 +53,7 @@ call_test() ->
     ?assertEqual(function, lua:type(L, 1)),
     ?assertEqual(ok, lua:pushnumber(L, 1)),
     ?assertEqual(ok, lua:call(L, 1, 1)),
-    ?assertEqual({ok, "number"}, lua:tolstring(L, 1)),
+    ?assertEqual({ok, <<"number">>}, lua:tolstring(L, 1)),
     lua:close(L).
     
 set_get_global_test() ->

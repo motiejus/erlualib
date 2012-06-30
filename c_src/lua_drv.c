@@ -102,8 +102,8 @@ process(ErlDrvData handle, ErlIOVec *ev)
   case ERL_LUA_PUSHINTEGER:
     erl_lua_pushinteger(driver_data, buf, index);
     break;
-  case ERL_LUA_PUSHSTRING:
-    erl_lua_pushstring(driver_data, buf, index);
+  case ERL_LUA_PUSHLSTRING:
+    erl_lua_pushlstring(driver_data, buf, index);
     break;
   case ERL_LUA_PUSHNIL:
     erl_lua_pushnil(driver_data, buf, index);

@@ -22,7 +22,7 @@ extern "C" {
   void erl_lua_newtable(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_pushboolean(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_pushinteger(lua_drv_t *driver_data, char *buf, int index);
-  void erl_lua_pushstring(lua_drv_t *driver_data, char *buf, int index);
+  void erl_lua_pushlstring(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_pushnil(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_pushnumber(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_remove(lua_drv_t *driver_data, char *buf, int index);

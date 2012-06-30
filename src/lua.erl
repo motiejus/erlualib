@@ -10,7 +10,7 @@
          newtable/1,
          pushboolean/2,
          pushinteger/2,
-         pushstring/2,
+         pushlstring/2,
          pushnil/1,
          pushnumber/2,
          remove/2,
@@ -88,9 +88,9 @@ pushinteger(L, Int) when is_integer(Int) ->
     command(L, {?ERL_LUA_PUSHINTEGER, Int}),
     receive_simple_response().
 
--spec pushstring(lua(), string()) -> ok.
-pushstring(L, String) when is_list(String) ->
-    command(L, {?ERL_LUA_PUSHSTRING, String}),
+-spec pushlstring(lua(), binary()) -> ok.
+pushlstring(L, String) when is_binary(String) ->
+    command(L, {?ERL_LUA_PUSHLSTRING, String}),
     receive_simple_response().
 
 -spec pushnil(lua()) -> ok.
@@ -130,7 +130,7 @@ tointeger(L, Index) ->
     command(L, {?ERL_LUA_TOINTEGER, Index}),
     receive_valued_response().
 
--spec tolstring(lua(), index()) -> {ok, string()}.
+-spec tolstring(lua(), index()) -> {ok, binary()}.
 tolstring(L, Index) ->
     command(L, {?ERL_LUA_TOLSTRING, Index}),
     receive_valued_response().
@@ -164,7 +164,7 @@ receive_simple_response() ->
     after ?STD_TIMEOUT ->
         {error, timeout}
     end.
-    
+
 receive_valued_response() ->
     receive
         {ok, Str} ->

@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <erl_driver.h>
 #include <ei.h>
 #include <lua.h>
@@ -9,8 +10,8 @@
 
 static void reply_ok(lua_drv_t *driver_data);
 static void reply_error(lua_drv_t *driver_data);
-static char* decode_string(char *buf, int *index);
-
+static char* decode_string(const char *buf, int *index);
+static char* decode_binary(const char *buf, int *index, int *len);
 
 void
 erl_lua_call(lua_drv_t *driver_data, char *buf, int index)
@@ -112,14 +113,15 @@ erl_lua_pushinteger(lua_drv_t *driver_data, char *buf, int index)
 }
 
 void
-erl_lua_pushstring(lua_drv_t *driver_data, char *buf, int index)
+erl_lua_pushlstring(lua_drv_t *driver_data, char *buf, int index)
 {
   char *str;
-  
-  str = decode_string(buf, &index);
-  
-  lua_pushstring(driver_data->L, str);
-  
+  int len;
+
+  str = decode_binary(buf, &index, &len);
+
+  lua_pushlstring(driver_data->L, str, len);
+
   reply_ok(driver_data);
   free(str);
 }
@@ -243,7 +245,7 @@ erl_lua_tolstring(lua_drv_t *driver_data, char *buf, int index)
   
   ErlDrvTermData spec[] = {
         ERL_DRV_ATOM,   ATOM_OK,
-        ERL_DRV_STRING, (ErlDrvTermData) str, len,
+        ERL_DRV_BUF2BINARY, (ErlDrvTermData) str, len,
         ERL_DRV_TUPLE,  2
   };
   driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
@@ -354,7 +356,7 @@ reply_error(lua_drv_t *driver_data)
 
 
 static char*
-decode_string(char *buf, int *index)
+decode_string(const char *buf, int *index)
 {
   int type, length;
   char *str;
@@ -362,5 +364,19 @@ decode_string(char *buf, int *index)
   ei_get_type(buf, index, &type, &length);
   str = malloc(sizeof(char) * (length + 1));
   ei_decode_string(buf, index, str);
+  return str;
+}
+
+static char*
+decode_binary(const char *buf, int *index, int *len)
+{
+  int type;
+  char *str;
+  long length; /* from ei_decode_binary */
+  
+  ei_get_type(buf, index, &type, len);
+  str = malloc(sizeof(char) * *len);
+  ei_decode_binary(buf, index, str, &length);
+  assert((int)length == *len);
   return str;
 }
