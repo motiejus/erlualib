@@ -6,9 +6,8 @@
 
 -spec open() -> {ok, lua:lua()} | {error, string()}.
 open() ->
-    {ok, L} = load_driver(),
     case load_driver() of
-        {ok, L} -> #lua{port=L};
+        {ok, Port} -> #lua{port=Port};
         E = {error, _} -> E
     end.
 
@@ -18,6 +17,7 @@ close(#lua{port=Port}) ->
 
 
 %% Private functions
+-spec load_driver() -> {ok, port()} | {error, string()}.
 load_driver() ->
     SearchDir = filename:join([filename:dirname(code:which(lua_driver)), "..", "priv"]),
     case erl_ddll:load(SearchDir, "liberlua") of
