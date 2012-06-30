@@ -103,7 +103,7 @@ pushnumber(L, Num) when is_number(Num) ->
     command(L, {?ERL_LUA_PUSHNUMBER, Num}),
     receive_simple_response().
 
--spec remove(lua(), abs_index()) -> ok.
+-spec remove(lua(), index()) -> ok.
 remove(L, Index) ->
     command(L, {?ERL_LUA_REMOVE, Index}),
     receive_simple_response().
