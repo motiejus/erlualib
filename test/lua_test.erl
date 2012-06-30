@@ -20,6 +20,15 @@ boolean_type_test() -> type_test_helper(true, pushboolean, boolean).
 num_type_test() -> type_test_helper(1, pushinteger, number).
 string_type_test() -> type_test_helper("labas", pushstring, string).
 
+remove_test() ->
+    {ok, L} = lua:new_state(),
+    lua:pushnumber(L, 1),
+    lua:pushnumber(L, 2),
+    ?assertEqual({ok, 2}, lua:gettop(L)),
+    ?assertEqual(ok, lua:remove(L, 2)),
+    ?assertEqual({ok, 1}, lua:gettop(L)),
+    lua:close(L).
+
 call_test() ->
     {ok, L} = lua:new_state(),
     ?assertEqual(ok, lua:getfield(L, global, "type")),

@@ -25,7 +25,9 @@
 -include("lua_api.hrl").
 
 -type lua() :: #lua{}.
--type index() :: pos_integer() | neg_integer().
+-type index() :: abs_index() | rel_index().
+-type abs_index() :: pos_integer().
+-type rel_index() :: neg_integer().
 
 -type lua_type() :: nil | boolean | light_user_data | number |
         string | table | function | user_data | thread | unknown.
@@ -65,7 +67,7 @@ getglobal(L, Name) ->
     command(L, {?ERL_LUA_GETGLOBAL, Name}),
     receive_simple_response().
 
--spec gettop(lua()) -> {ok, non_neg_integer()}.
+-spec gettop(lua()) -> {ok, abs_index()}.
 gettop(L) ->
     command(L, {?ERL_LUA_GETTOP}),
     receive_valued_response().
@@ -95,7 +97,7 @@ pushnumber(L, Num) when is_number(Num) ->
     command(L, {?ERL_LUA_PUSHNUMBER, Num}),
     receive_simple_response().
 
--spec remove(lua(), index()) -> ok.
+-spec remove(lua(), abs_index()) -> ok.
 remove(L, Index) ->
     command(L, {?ERL_LUA_REMOVE, Index}),
     receive_simple_response().
