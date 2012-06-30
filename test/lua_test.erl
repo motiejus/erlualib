@@ -18,7 +18,7 @@ bool_test() -> push_to_helper(false, pushboolean, toboolean).
 nil_type_test() -> type_test_helper(pushnil, nil).
 boolean_type_test() -> type_test_helper(true, pushboolean, boolean).
 num_type_test() -> type_test_helper(1, pushinteger, number).
-string_type_test() -> type_test_helper("labas", pushstring, string).
+string_type_test() -> type_test_helper("foo", pushstring, string).
 table_type_test() -> type_test_helper(newtable, table).
 
 remove_test() ->
