@@ -110,10 +110,11 @@ tonumber(L, Index) ->
     Value2 = list_to_binary(Value),
     {ok, binary_to_term(Value2)}.
 
+-spec type(lua(), index()) -> lua_type().
 type(L, Index) ->
     command(L, {?ERL_LUA_TYPE, Index}),
-    receive_valued_response().
-
+    {ok, Ret} = receive_valued_response(),
+    lua_type_to_atom(Ret).
 
 command(#lua{port=Port}, Data) ->
     port_command(Port, term_to_binary(Data)).
@@ -143,3 +144,15 @@ receive_valued_response() ->
     after ?STD_TIMEOUT ->
         {error, timeout}
     end.
+
+-spec lua_type_to_atom(non_neg_integer()) -> lua_type().
+lua_type_to_atom(0) -> nil;
+lua_type_to_atom(1) -> boolean;
+lua_type_to_atom(2) -> light_user_data;
+lua_type_to_atom(3) -> number;
+lua_type_to_atom(4) -> string;
+lua_type_to_atom(5) -> table;
+lua_type_to_atom(6) -> function;
+lua_type_to_atom(7) -> user_data;
+lua_type_to_atom(8) -> thread;
+lua_type_to_atom(_) -> unknown.
