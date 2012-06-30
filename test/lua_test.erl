@@ -31,10 +31,10 @@ call_test() ->
     
 set_get_global_test() ->
     {ok, L} = lua:new_state(),
-    ?assertMatch(ok, lua:pushnumber(L, 23)),
-    ?assertMatch(ok, lua:setfield(L, global, "foo")),
-    ?assertMatch(ok, lua:getfield(L, global, "foo")),
-    ?assertMatch({ok, 23}, lua:tonumber(L, 1)),
+    ?assertEqual(ok, lua:pushnumber(L, 23)),
+    ?assertEqual(ok, lua:setfield(L, global, "foo")),
+    ?assertEqual(ok, lua:getfield(L, global, "foo")),
+    ?assertEqual({ok, 23}, lua:tonumber(L, 1)),
     lua:close(L).
 
 %% =============================================================================
@@ -43,8 +43,8 @@ set_get_global_test() ->
 
 push_to_helper(Val, Push, To) ->
     {ok, L} = lua:new_state(),
-    ?assertMatch(ok, lua:Push(L, Val)),
-    ?assertMatch({ok, Val}, lua:To(L, 1)),
+    ?assertEqual(ok, lua:Push(L, Val)),
+    ?assertEqual({ok, Val}, lua:To(L, 1)),
     lua:close(L).
 
 type_test_helper(PushFun, Type) ->
