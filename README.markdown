@@ -4,8 +4,10 @@ include a higher level API to simplify things further.
 
 This is a fork of Ray Morgan's Erl-Lua library[1] with:
 
-* Bugfixes
+* Rebar
 * Much better test coverage (all API except for boilerplate is covered)
+* Dialyzer is happy about this project
+* Some Bugfixes
 * Some new commands (lua_newtable, lua_pushlstring)
 * Strings in Lua are Binaries in Erlang (instead of lists of numbers)
 
