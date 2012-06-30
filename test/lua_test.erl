@@ -24,11 +24,21 @@ table_type_test() -> type_test_helper(newtable, table).
 remove_test() ->
     {ok, L} = lua:new_state(),
     lua:pushnumber(L, 1),
-    lua:pushnumber(L, 2),
-    ?assertEqual({ok, 2}, lua:gettop(L)),
-    ?assertEqual(ok, lua:remove(L, 2)),
     ?assertEqual({ok, 1}, lua:gettop(L)),
+    ?assertEqual(ok, lua:remove(L, 1)),
+    ?assertEqual({ok, 0}, lua:gettop(L)),
     lua:close(L).
+
+set_get_field_test() ->
+    {ok, L} = lua:new_state(),
+    lua:newtable(L),
+    lua:pushboolean(L, true),
+    ?assertEqual(table, lua:type(L, 1)),
+    ?assertEqual(boolean, lua:type(L, 2)),
+    ?assertEqual(ok, lua:setfield(L, 1, "foo")),
+    ?assertEqual(table, lua:type(L, 1)),
+    ?assertEqual(ok, lua:getfield(L, 1, "foo")),
+    ?assertEqual({ok, true}, lua:toboolean(L, 2)).
 
 call_test() ->
     {ok, L} = lua:new_state(),
