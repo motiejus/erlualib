@@ -178,5 +178,4 @@ lua_type_to_atom(4) -> string;
 lua_type_to_atom(5) -> table;
 lua_type_to_atom(6) -> function;
 lua_type_to_atom(7) -> user_data;
-lua_type_to_atom(8) -> thread;
-lua_type_to_atom(_) -> unknown.
+lua_type_to_atom(8) -> thread.
