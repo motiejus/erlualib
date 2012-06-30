@@ -30,80 +30,104 @@
 -type lua_type() :: nil | boolean | light_user_data | number |
         string | table | function | user_data | thread | unknown.
 
+-export_type([lua/0]).
+
+-type lua_name() :: string().
+
+-spec new_state() -> {ok, lua()}.
 new_state() ->
     {ok, lua_driver:open()}.
     
+-spec close(lua()) -> true.
 close(L) ->
     lua_driver:close(L).
 
+%% @doc Calls a function.
+-spec call(lua(), non_neg_integer(), non_neg_integer()) -> ok.
 call(L, Args, Results) ->
     command(L, {?ERL_LUA_CALL, Args, Results}),
     receive_simple_response().
-    
-concat(L, N) ->
-    command(L, {?ERL_LUA_CONCAT, N}).
 
+-spec concat(lua(), index()) -> ok.
+concat(L, N) ->
+    command(L, {?ERL_LUA_CONCAT, N}),
+    receive_simple_response().
+
+-spec getfield(lua(), global | index(), lua_name()) -> ok.
 getfield(L, global, Name) ->
     getglobal(L, Name);
 getfield(L, Index, Name) ->
     command(L, {?ERL_LUA_GETFIELD, Index, Name}),
     receive_simple_response().
     
+-spec getglobal(lua(), lua_name()) -> ok.
 getglobal(L, Name) ->
     command(L, {?ERL_LUA_GETGLOBAL, Name}),
     receive_simple_response().
 
+-spec gettop(lua()) -> {ok, non_neg_integer()}.
 gettop(L) ->
     command(L, {?ERL_LUA_GETTOP}),
     receive_valued_response().
-    
 
+-spec pushboolean(lua(), boolean()) -> ok.
 pushboolean(L, Bool) ->
     command(L, {?ERL_LUA_PUSHBOOLEAN, Bool}),
     receive_simple_response().
-    
+
+-spec pushinteger(lua(), integer()) -> ok.
 pushinteger(L, Int) when is_integer(Int) ->
     command(L, {?ERL_LUA_PUSHINTEGER, Int}),
     receive_simple_response().
 
+-spec pushstring(lua(), string()) -> ok.
 pushstring(L, String) when is_list(String) ->
     command(L, {?ERL_LUA_PUSHSTRING, String}),
     receive_simple_response().
 
+-spec pushnil(lua()) -> ok.
 pushnil(L) ->
     command(L, {?ERL_LUA_PUSHNIL}),
     receive_simple_response().
-    
+
+-spec pushnumber(lua(), number()) -> ok.
 pushnumber(L, Num) when is_number(Num) ->
     command(L, {?ERL_LUA_PUSHNUMBER, Num}),
     receive_simple_response().
 
+-spec remove(lua(), index()) -> ok.
 remove(L, Index) ->
     command(L, {?ERL_LUA_REMOVE, Index}),
     receive_simple_response().
-    
+
+-spec setfield(lua(), global | index(), string()) -> ok.
 setfield(L, global, Name) ->
     setglobal(L, Name);
 setfield(L, Index, Name) ->
     command(L, {?ERL_LUA_SETFIELD, Index, Name}),
     receive_simple_response().
 
+-spec setglobal(lua(), string()) -> ok.
 setglobal(L, Name) ->
     command(L, {?ERL_LUA_SETGLOBAL, Name}),
     receive_simple_response().
 
+-spec toboolean(lua(), index()) -> {ok, boolean()}.
 toboolean(L, Index) ->
     command(L, {?ERL_LUA_TOBOOLEAN, Index}),
     receive_valued_response().
 
+-spec tointeger(lua(), index()) -> {ok, integer()}.
 tointeger(L, Index) ->
     command(L, {?ERL_LUA_TOINTEGER, Index}),
     receive_valued_response().
 
+-spec tolstring(lua(), index()) -> {ok, string()}.
 tolstring(L, Index) ->
     command(L, {?ERL_LUA_TOLSTRING, Index}),
     receive_valued_response().
 
+-spec tonumber(lua(), index()) -> {ok, number()}.
 tonumber(L, Index) ->
     command(L, {?ERL_LUA_TONUMBER, Index}),
     {ok, Value} = receive_valued_response(),

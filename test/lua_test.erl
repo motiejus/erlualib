@@ -36,6 +36,10 @@ set_get_global_test() ->
     ?assertMatch({ok, 23}, lua:tonumber(L, 1)),
     lua:close(L).
 
+%% =============================================================================
+%% Helpers
+%% =============================================================================
+
 push_to_helper(Val, Push, To) ->
     {ok, L} = lua:new_state(),
     ?assertMatch(ok, lua:Push(L, Val)),

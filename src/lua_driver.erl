@@ -4,10 +4,15 @@
 
 -include("lua.hrl").
 
+-spec open() -> {ok, lua:lua()} | {error, string()}.
 open() ->
     {ok, L} = load_driver(),
-    #lua{port=L}.
+    case load_driver() of
+        {ok, L} -> #lua{port=L};
+        E = {error, _} -> E
+    end.
 
+-spec close(lua:lua()) -> true.
 close(#lua{port=Port}) ->
     port_close(Port).
 
@@ -15,9 +20,9 @@ close(#lua{port=Port}) ->
 %% Private functions
 load_driver() ->
     SearchDir = filename:join([filename:dirname(code:which(lua_driver)), "..", "priv"]),
-    case erl_ddll:load(SearchDir, liberlua) of
+    case erl_ddll:load(SearchDir, "liberlua") of
         ok ->
-            {ok, open_port({spawn, 'liberlua'}, [binary])};
+            {ok, open_port({spawn, "liberlua"}, [binary])};
         {error, Error} ->
             {error, erl_ddll:format_error(Error)}
     end.
