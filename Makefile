@@ -1,4 +1,4 @@
-REBAR=`which rebar`
+REBAR=$(shell which rebar)
 
 .PHONY: clean compile test
 
