@@ -38,6 +38,13 @@ erl_lua_concat(lua_drv_t *driver_data, char *buf, int index)
 }
 
 void
+erl_lua_newtable(lua_drv_t *driver_data, char *buf, int index)
+{
+  lua_newtable(driver_data->L);
+  reply_ok(driver_data);
+}
+
+void
 erl_lua_getfield(lua_drv_t *driver_data, char *buf, int index)
 {
   long i;

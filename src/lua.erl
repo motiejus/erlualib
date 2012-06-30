@@ -7,6 +7,7 @@
          getfield/3,
          getglobal/2,
          gettop/1,
+         newtable/1,
          pushboolean/2,
          pushinteger/2,
          pushstring/2,
@@ -71,6 +72,11 @@ getglobal(L, Name) ->
 gettop(L) ->
     command(L, {?ERL_LUA_GETTOP}),
     receive_valued_response().
+
+-spec newtable(lua()) -> ok.
+newtable(L) ->
+    command(L, {?ERL_LUA_NEWTABLE}),
+    receive_simple_response().
 
 -spec pushboolean(lua(), boolean()) -> ok.
 pushboolean(L, Bool) ->

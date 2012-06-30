@@ -19,6 +19,7 @@ nil_type_test() -> type_test_helper(pushnil, nil).
 boolean_type_test() -> type_test_helper(true, pushboolean, boolean).
 num_type_test() -> type_test_helper(1, pushinteger, number).
 string_type_test() -> type_test_helper("labas", pushstring, string).
+table_type_test() -> type_test_helper(newtable, table).
 
 remove_test() ->
     {ok, L} = lua:new_state(),
