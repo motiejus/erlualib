@@ -26,9 +26,9 @@ Example:
     lua:getfield(L, global, "type").
     lua:pushnumber(L, 23).
     lua:call(L, 1, 1).
-    {ok, S} = lua:tolstring(L, 1).
+    S = lua:tolstring(L, 1).
     lua:remove(L, 1). % always rebalance the stack.. it is the right thing to do!
-    S. % => "number" 
+    S. % => <<"number">>
 
 For more examples, see the tests.
 
