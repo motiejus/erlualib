@@ -167,7 +167,7 @@ receive_valued_response() ->
         {ok, Str} ->
             Str;
         Other ->
-            error({lua_error, Other})
+            throw({lua_error, Other})
     after ?STD_TIMEOUT ->
             error(timeout)
     end.
