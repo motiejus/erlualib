@@ -101,18 +101,32 @@ push_args(L, Args) when is_tuple(Args) ->
             push_args(L, Arg),
             lua:settable(L, TPos)
     end,
-    lists:foreach(Fun, tuple_to_list(Args)).
+    lists:foreach(Fun, lists:zip(
+            lists:seq(1, size(Args)),
+            tuple_to_list(Args))
+    ).
 
 pop_results(_) ->
     ok.
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
-push_args_table_test() ->
+push_args_empty_table_test() ->
     {ok, L} = lua:new_state(),
     push_args(L, {}),
     ?assertEqual(1, lua:gettop(L)),
-    % ?assertEqual(0, lua:
-    ok.
+    ?assertEqual(0, lua:objlen(L, 1)).
+
+push_args_table1_test() ->
+    {ok, L} = lua:new_state(),
+    push_args(L, {true, {}, <<"yadda">>}),
+    ?assertEqual(1, lua:gettop(L)),
+    ?assertEqual(3, lua:objlen(L, 1)),
+    lua:getfield(L, 1, 1),
+    ?assertEqual(boolean, lua:type(L, 2)),
+    lua:getfield(L, 1, 2),
+    ?assertEqual(table, lua:type(L, 3)),
+    lua:getfield(L, 1, 3),
+    ?assertEqual(string, lua:type(L, 4)).
 
 -endif.
