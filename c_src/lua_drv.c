@@ -132,6 +132,9 @@ process(ErlDrvData handle, ErlIOVec *ev)
   case ERL_LUA_TONUMBER:
     erl_lua_tonumber(driver_data, buf, index);
     break;
+  case ERL_LUA_SETTABLE:
+    erl_lua_settable(driver_data, buf, index);
+    break;
   case ERL_LUA_TYPE:
     erl_lua_type(driver_data, buf, index);
     break;

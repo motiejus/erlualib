@@ -293,6 +293,17 @@ erl_lua_tonumber(lua_drv_t *driver_data, char *buf, int index)
 }
 
 void
+erl_lua_settable(lua_drv_t *driver_data, char *buf, int index)
+{
+    long i;
+    ei_decode_long(buf, &index, &i);
+
+    lua_settable(driver_data->L, i);
+
+    reply_ok(driver_data);
+}
+
+void
 erl_lua_type(lua_drv_t *driver_data, char *buf, int index)
 {
   long i;

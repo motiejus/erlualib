@@ -20,6 +20,7 @@
          tointeger/2,
          tolstring/2,
          tonumber/2,
+         settable/2,
          type/2]).
 
 -include("lua.hrl").
@@ -139,6 +140,11 @@ tolstring(L, Index) ->
 tonumber(L, Index) ->
     command(L, {?ERL_LUA_TONUMBER, Index}),
     binary_to_term(receive_valued_response()).
+
+-spec settable(lua(), index()) -> ok.
+settable(L, Index) ->
+    command(L, {?ERL_LUA_SETTABLE, Index}),
+    receive_simple_response().
 
 -spec type(lua(), index()) -> lua_type().
 type(L, Index) ->
