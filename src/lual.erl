@@ -7,6 +7,8 @@
 %%% +------------+----------------+
 %%% | Erlang     |      Lua       |
 %%% +------------+----------------+
+%%% | 'nil'      | nil
+%%% | boolean    | boolean        |
 %%% | binary     | string         |
 %%% | atom       | string         |
 %%% | string     | string         |
@@ -20,7 +22,7 @@
 %%% |       Lua       |   Erlang   |
 %%% +-----------------+------------+
 %%% | nil             | nil        |
-%%% | boolean         | true|false |
+%%% | boolean         | boolean    |
 %%% | light_user_data | --NA--     |
 %%% | number          | float      |
 %%% | string          | binary     |
@@ -40,6 +42,7 @@
 -module(lual).
 
 -export([dostring/2, call/4]).
+-export([push_args/2]).
 
 -include("lua.hrl").
 -include("lua_api.hrl").
@@ -81,14 +84,35 @@ call(L, Fun, Args, 1) ->
     lua:call(L, Fun, length(Args), 1),
     pop_results(L).
 
+
+push_args(L, nil) ->
+    lua:pushnil(L);
+push_args(L, Arg) when is_boolean(Arg) ->
+    lua:pushboolean(L, Arg);
 push_args(L, Arg) when is_binary(Arg) ->
     lua:pushlstring(L, Arg);
 push_args(L, Arg) when is_number(Arg) ->
     lua:pushnumber(L, Arg);
 push_args(L, Args) when is_tuple(Args) ->
+    lua:createtable(L, size(Args), 0),
+    TPos = lua:gettop(L), % table position we have just created
     Fun = fun({I, Arg}) ->
             lua:pushnumber(L, I),
-            push_args(L, Arg)
-    end.
+            push_args(L, Arg),
+            lua:settable(L, TPos)
+    end,
+    lists:foreach(Fun, tuple_to_list(Args)).
+
 pop_results(_) ->
     ok.
+
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+push_args_table_test() ->
+    {ok, L} = lua:new_state(),
+    push_args(L, {}),
+    ?assertEqual(1, lua:gettop(L)),
+    % ?assertEqual(0, lua:
+    ok.
+
+-endif.
