@@ -52,6 +52,23 @@ erl_lua_createtable(lua_drv_t *driver_data, char *buf, int index)
 }
 
 void
+erl_lua_objlen(lua_drv_t *driver_data, char *buf, int index)
+{
+  long i;
+  size_t size;
+  
+  ei_decode_long(buf, &index, &i);
+  size = lua_objlen(driver_data->L, i);
+
+  ErlDrvTermData spec[] = {
+        ERL_DRV_ATOM,   ATOM_OK,
+        ERL_DRV_INT, (ErlDrvTermData) size,
+        ERL_DRV_TUPLE,  2
+  };
+  driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
+}
+
+void
 erl_lua_newtable(lua_drv_t *driver_data, char *buf, int index)
 {
   lua_newtable(driver_data->L);
