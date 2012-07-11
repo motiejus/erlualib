@@ -76,5 +76,19 @@ recieve_simple_response() ->
     end.
 
 -spec call(lua:lua(), string(), args(), pos_integer()) -> ret().
-call(L, Fun, Args, Num) ->
+call(L, Fun, Args, 1) ->
+    push_args(L, Args),
+    lua:call(L, Fun, length(Args), 1),
+    pop_results(L).
+
+push_args(L, Arg) when is_binary(Arg) ->
+    lua:pushlstring(L, Arg);
+push_args(L, Arg) when is_number(Arg) ->
+    lua:pushnumber(L, Arg);
+push_args(L, Args) when is_tuple(Args) ->
+    Fun = fun({I, Arg}) ->
+            lua:pushnumber(L, I),
+            push_args(L, Arg)
+    end.
+pop_results(_) ->
     ok.
