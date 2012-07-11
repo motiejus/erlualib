@@ -25,6 +25,7 @@ createtable_test() ->
     {ok, L} = lua:new_state(),
     ?assertEqual(ok, lua:createtable(L, 0, 2)),
     ?assertEqual(table, lua:type(L, 1)),
+    ?assertEqual(0, lua:objlen(L, 1)),
     lua:close(L).
 
 settable_test() ->
@@ -62,9 +63,12 @@ set_get_field_test() ->
 concat_test() ->
     {ok, L} = lua:new_state(),
     lua:pushlstring(L, <<"ya">>),
+    ?assertEqual(2, lua:objlen(L, 1)),
     lua:pushlstring(L, <<"dda">>),
+    ?assertEqual(3, lua:objlen(L, 2)),
     ?assertEqual(ok, lua:concat(L, 2)),
-    ?assertEqual(<<"yadda">>, lua:tolstring(L, 1)).
+    ?assertEqual(<<"yadda">>, lua:tolstring(L, 1)),
+    ?assertEqual(5, lua:objlen(L, 1)).
 
 call_test() ->
     {ok, L} = lua:new_state(),
