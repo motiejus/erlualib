@@ -25,5 +25,5 @@ sah(Val) ->
 sah(Val, Expect) ->
     {ok, L} = lua:new_state(),
     lual:dostring(L, <<"function t(c) return c end">>),
-    ?assertEqual(Val, lual:call(L, "t", [Val], 1)),
+    ?assertEqual(Expect, lual:call(L, "t", [Val], 1)),
     lua:close(L).

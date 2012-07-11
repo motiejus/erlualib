@@ -122,11 +122,19 @@ push_args_table1_test() ->
     push_args(L, {true, {}, <<"yadda">>}),
     ?assertEqual(1, lua:gettop(L)),
     ?assertEqual(3, lua:objlen(L, 1)),
-    lua:getfield(L, 1, 1),
+    lua:pushnumber(L, 1), lua:gettable(L, 1), % push t[1]
     ?assertEqual(boolean, lua:type(L, 2)),
-    lua:getfield(L, 1, 2),
+    lua:pushnumber(L, 2), lua:gettable(L, 1), % push t[2]
     ?assertEqual(table, lua:type(L, 3)),
-    lua:getfield(L, 1, 3),
+    lua:pushnumber(L, 3), lua:gettable(L, 1), % push t[3]
     ?assertEqual(string, lua:type(L, 4)).
+
+push_args_nested_table_test() ->
+    {ok, L} = lua:new_state(),
+    push_args(L, {{true}}),
+    ?assertEqual(1, lua:gettop(L)),
+    lua:pushnumber(L, 1), lua:gettable(L, 1), % push t[1]
+    lua:pushnumber(L, 1), lua:gettable(L, 2), % push inner t[1]
+    ?assertEqual(boolean, lua:type(L, -1)).
 
 -endif.
