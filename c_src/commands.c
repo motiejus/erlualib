@@ -13,6 +13,7 @@ static void reply_error(lua_drv_t *driver_data);
 static char* decode_string(const char *buf, int *index);
 static char* decode_binary(const char *buf, int *index, int *len);
 
+/* 2 longs, lua_call */
 void
 erl_lua_call(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -26,6 +27,7 @@ erl_lua_call(lua_drv_t *driver_data, char *buf, int index)
   reply_ok(driver_data);
 }
 
+/* 1 long, lua_concat */
 void
 erl_lua_concat(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -38,6 +40,7 @@ erl_lua_concat(lua_drv_t *driver_data, char *buf, int index)
   reply_ok(driver_data);
 }
 
+/* 2 longs, lua_createtable */
 void
 erl_lua_createtable(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -51,6 +54,7 @@ erl_lua_createtable(lua_drv_t *driver_data, char *buf, int index)
   reply_ok(driver_data);
 }
 
+/* long, size_t, lua_objlen. {ok, integer} */
 void
 erl_lua_objlen(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -68,6 +72,7 @@ erl_lua_objlen(lua_drv_t *driver_data, char *buf, int index)
   driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
 }
 
+/* [], lua_newtable */
 void
 erl_lua_newtable(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -75,6 +80,7 @@ erl_lua_newtable(lua_drv_t *driver_data, char *buf, int index)
   reply_ok(driver_data);
 }
 
+/* long, string, lua_getfield */
 void
 erl_lua_getfield(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -90,6 +96,7 @@ erl_lua_getfield(lua_drv_t *driver_data, char *buf, int index)
   free(name);
 }
 
+/* string, lua_getglobal */
 void
 erl_lua_getglobal(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -103,6 +110,7 @@ erl_lua_getglobal(lua_drv_t *driver_data, char *buf, int index)
   free(name);
 }
 
+/* long, lua_gettable */
 void
 erl_lua_gettable(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -114,6 +122,7 @@ erl_lua_gettable(lua_drv_t *driver_data, char *buf, int index)
     reply_ok(driver_data);
 }
 
+/* [], lua_gettop. {ok, integer} */
 void
 erl_lua_gettop(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -129,6 +138,7 @@ erl_lua_gettop(lua_drv_t *driver_data, char *buf, int index)
   driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
 }
 
+/* boolean, lua_pushboolean */
 void
 erl_lua_pushboolean(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -141,6 +151,7 @@ erl_lua_pushboolean(lua_drv_t *driver_data, char *buf, int index)
   reply_ok(driver_data);
 }
 
+/* long long, lua_pushinteger */
 void
 erl_lua_pushinteger(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -153,6 +164,7 @@ erl_lua_pushinteger(lua_drv_t *driver_data, char *buf, int index)
   reply_ok(driver_data);
 }
 
+/* string, lua_pushlstring */
 void
 erl_lua_pushlstring(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -167,6 +179,7 @@ erl_lua_pushlstring(lua_drv_t *driver_data, char *buf, int index)
   free(str);
 }
 
+/* [], lua_pushnil */
 void
 erl_lua_pushnil(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -174,6 +187,7 @@ erl_lua_pushnil(lua_drv_t *driver_data, char *buf, int index)
   reply_ok(driver_data);
 }
 
+/* float or long, lua_pushnumber */
 void
 erl_lua_pushnumber(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -197,6 +211,7 @@ erl_lua_pushnumber(lua_drv_t *driver_data, char *buf, int index)
   reply_ok(driver_data);
 }
 
+/* long, lua_remove */
 void
 erl_lua_remove(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -209,6 +224,7 @@ erl_lua_remove(lua_drv_t *driver_data, char *buf, int index)
   reply_ok(driver_data);
 }
 
+/* long, string, lua_setfield */
 void
 erl_lua_setfield(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -224,6 +240,7 @@ erl_lua_setfield(lua_drv_t *driver_data, char *buf, int index)
   free(name);
 }
 
+/* string, lua_setglobal */
 void
 erl_lua_setglobal(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -237,6 +254,7 @@ erl_lua_setglobal(lua_drv_t *driver_data, char *buf, int index)
   free(name);
 }
 
+/* long, lua_toboolean, {ok, boolean()} */
 void
 erl_lua_toboolean(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -255,6 +273,7 @@ erl_lua_toboolean(lua_drv_t *driver_data, char *buf, int index)
   driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
 }
 
+/* long, lua_tointeger, {ok, integer()} */
 void
 erl_lua_tointeger(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -273,6 +292,7 @@ erl_lua_tointeger(lua_drv_t *driver_data, char *buf, int index)
   driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
 }
 
+/* long, lua_tolstring, {ok, binary()} */
 void
 erl_lua_tolstring(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -292,6 +312,7 @@ erl_lua_tolstring(lua_drv_t *driver_data, char *buf, int index)
   driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
 }
 
+/* long, lua_tonumber, {ok, binary()} */
 void
 erl_lua_tonumber(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -333,6 +354,7 @@ erl_lua_tonumber(lua_drv_t *driver_data, char *buf, int index)
   free(eibuf);
 }
 
+/* long, lua_settable */
 void
 erl_lua_settable(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -344,6 +366,7 @@ erl_lua_settable(lua_drv_t *driver_data, char *buf, int index)
     reply_ok(driver_data);
 }
 
+/* long, lua_type, {ok, integer()} */
 void
 erl_lua_type(lua_drv_t *driver_data, char *buf, int index)
 {
@@ -362,7 +385,7 @@ erl_lua_type(lua_drv_t *driver_data, char *buf, int index)
   driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
 }
 
-
+/* string, luaL_dostring */
 void
 erl_lual_dostring(lua_drv_t *driver_data, char *buf, int index)
 {
