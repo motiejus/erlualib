@@ -39,6 +39,19 @@ erl_lua_concat(lua_drv_t *driver_data, char *buf, int index)
 }
 
 void
+erl_lua_createtable(lua_drv_t *driver_data, char *buf, int index)
+{
+  long narr, nrec;
+
+  ei_decode_long(buf, &index, &narr);
+  ei_decode_long(buf, &index, &nrec);
+
+  lua_createtable(driver_data->L, narr, nrec);
+
+  reply_ok(driver_data);
+}
+
+void
 erl_lua_newtable(lua_drv_t *driver_data, char *buf, int index)
 {
   lua_newtable(driver_data->L);

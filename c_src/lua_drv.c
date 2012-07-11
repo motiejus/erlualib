@@ -84,6 +84,9 @@ process(ErlDrvData handle, ErlIOVec *ev)
   case ERL_LUA_CONCAT:
     erl_lua_concat(driver_data, buf, index);
     break;
+  case ERL_LUA_CREATETABLE:
+    erl_lua_createtable(driver_data, buf, index);
+    break;
   case ERL_LUA_NEWTABLE:
     erl_lua_newtable(driver_data, buf, index);
     break;
