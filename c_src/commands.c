@@ -315,8 +315,9 @@ void
 erl_lual_dostring(lua_drv_t *driver_data, char *buf, int index)
 {
   char *code;
-  
-  code = decode_string(buf, &index);
+  int len;
+
+  code = decode_binary(buf, &index, &len);
   
   if (!luaL_dostring(driver_data->L, code))
     reply_ok(driver_data);

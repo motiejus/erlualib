@@ -35,7 +35,7 @@ For more examples, see the tests.
 There is also a simple way to run one off simple Lua code snippets:
 
     (continued from above)
-    lual:dostring(L, "print 'Howdy!'").
+    lual:dostring(L, <<"print 'Howdy!'">>).
     % (Lua) => Howdy!
     
 **NEW Higher Level API**
@@ -45,7 +45,7 @@ There is also a simple way to run one off simple Lua code snippets:
     1> {ok, L} = lua:new_state().
     2> lua_erl:call(L, type, [23], 1).
     {"number"}
-    3> lual:dostring(L, "function add(a, b, c) return a + b + c end").
+    3> lual:dostring(L, <<"function add(a, b, c) return a + b + c end">>).
     4> lua_erl:call(L, add, [2, 3, 4], 1).
     {9}
 
