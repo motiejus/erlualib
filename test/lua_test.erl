@@ -21,6 +21,12 @@ num_type_test() -> type_test_helper(1, pushinteger, number).
 string_type_test() -> type_test_helper(<<"foo">>, pushlstring, string).
 table_type_test() -> type_test_helper(newtable, table).
 
+createtable_test() ->
+    {ok, L} = lua:new_state(),
+    ?assertEqual(ok, lua:createtable(L, 0, 2)),
+    ?assertEqual(table, lua:type(L, 1)),
+    lua:close(L).
+
 settable_test() ->
     {ok, L} = lua:new_state(),
     ?assertEqual(ok, lua:newtable(L)),
@@ -32,6 +38,7 @@ settable_test() ->
     lua:getfield(L, 1, "x"),
     ?assertEqual(<<"y">>, lua:tolstring(L, -1)),
     lua:close(L).
+
 
 remove_test() ->
     {ok, L} = lua:new_state(),

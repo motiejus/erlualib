@@ -16,6 +16,7 @@ extern "C" {
 
   void erl_lua_call(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_concat(lua_drv_t *driver_data, char *buf, int index);
+  void erl_lua_createtable(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_getfield (lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_getglobal(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_gettop(lua_drv_t *driver_data, char *buf, int index);

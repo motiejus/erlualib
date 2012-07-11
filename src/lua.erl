@@ -4,6 +4,7 @@
          close/1,
          call/3,
          concat/2,
+         createtable/3,
          getfield/3,
          getglobal/2,
          gettop/1,
@@ -77,6 +78,11 @@ gettop(L) ->
 -spec newtable(lua()) -> ok.
 newtable(L) ->
     command(L, {?ERL_LUA_NEWTABLE}),
+    receive_simple_response().
+
+-spec createtable(lua(), non_neg_integer(), non_neg_integer()) -> ok.
+createtable(L, Narr, Nrec) ->
+    command(L, {?ERL_LUA_CREATETABLE, Narr, Nrec}),
     receive_simple_response().
 
 -spec pushboolean(lua(), boolean()) -> ok.
