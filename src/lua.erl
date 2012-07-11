@@ -7,6 +7,7 @@
          createtable/3,
          getfield/3,
          getglobal/2,
+         gettable/2,
          gettop/1,
          newtable/1,
          objlen/2,
@@ -69,6 +70,11 @@ getfield(L, Index, Name) ->
 -spec getglobal(lua(), lua_name()) -> ok.
 getglobal(L, Name) ->
     command(L, {?ERL_LUA_GETGLOBAL, Name}),
+    receive_simple_response().
+
+-spec gettable(lua(), index()) -> ok.
+gettable(L, Index) ->
+    command(L, {?ERL_LUA_GETTABLE, Index}),
     receive_simple_response().
 
 -spec gettop(lua()) -> abs_index().

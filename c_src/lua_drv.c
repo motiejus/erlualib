@@ -99,6 +99,9 @@ process(ErlDrvData handle, ErlIOVec *ev)
   case ERL_LUA_GETGLOBAL:
     erl_lua_getglobal(driver_data, buf, index);
     break;
+  case ERL_LUA_GETTABLE:
+    erl_lua_gettable(driver_data, buf, index);
+    break;
   case ERL_LUA_GETTOP:
     erl_lua_gettop(driver_data, buf, index);
     break;

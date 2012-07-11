@@ -104,6 +104,17 @@ erl_lua_getglobal(lua_drv_t *driver_data, char *buf, int index)
 }
 
 void
+erl_lua_gettable(lua_drv_t *driver_data, char *buf, int index)
+{
+    long i;
+
+    ei_decode_long(buf, &index, &i);
+    lua_gettable(driver_data->L, i);
+
+    reply_ok(driver_data);
+}
+
+void
 erl_lua_gettop(lua_drv_t *driver_data, char *buf, int index)
 {
   int size;

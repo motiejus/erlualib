@@ -37,9 +37,18 @@ settable_test() ->
     ?assertEqual(ok, lua:settable(L, 1)),
     ?assertEqual(1, lua:gettop(L)),
     lua:getfield(L, 1, "x"),
-    ?assertEqual(<<"y">>, lua:tolstring(L, -1)),
-    lua:close(L).
+    ?assertEqual(<<"y">>, lua:tolstring(L, -1)).
 
+gettable_test() ->
+    {ok, L} = lua:new_state(),
+    lua:newtable(L),
+    lua:pushnumber(L, 2),
+    lua:pushnumber(L, 3),
+    lua:settable(L, 1), % t[2] = 3
+    lua:pushnumber(L, 2),
+    lua:gettable(L, -2), % push t[2] to top
+    ?assertEqual(3, lua:tonumber(L, -1)),
+    lua:close(L).
 
 remove_test() ->
     {ok, L} = lua:new_state(),
