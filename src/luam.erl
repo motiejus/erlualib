@@ -84,10 +84,10 @@ push_arg(L, Args) when is_tuple(Args) ->
             lists:seq(1, size(Args)),
             tuple_to_list(Args))
     );
-push_arg(L, Args) when is_list(Args) ->
+push_arg(_L, Args) when is_list(Args) ->
     throw(not_implemented).
 
-%% @doc Pops N results from the stack and returns result tuple
+%% @doc Pop N results from the stack and return result tuple
 -spec pop_results(lua:lua(), pos_integer()) -> tuple().
 pop_results(L, N) ->
     MapFun = fun(_) -> R = toterm(L, -1), lua:remove(L, -1), R end,
@@ -103,23 +103,23 @@ toterm(L, N) ->
         string -> lua:tolstring(L, N);
         table ->
             F = fun(K, V, Acc) -> [{K, V}|Acc] end,
-            lists:reverse(fold(L, N, F, []))
+            lists:reverse(fold(F, [], L, N))
     end.
 
 %% @doc Call Fun over table on index N
--spec fold(lua:lua(), N :: lua:index(), Fun, Acc0) -> Acc1 when
+-spec fold(Fun, Acc0, lua:lua(), N :: lua:index()) -> Acc1 when
       Fun :: fun((ret(), ret(), AccIn) -> AccOut),
       Acc0 :: term(),
       Acc1 :: term(),
       AccIn :: term(),
       AccOut :: term().
-fold(L, N, Fun, Acc0) ->
+fold(Fun, Acc0, L, N) ->
     lua:pushnil(L),
-    fold(L, N, Fun, Acc0, lua:next(L, N)).
+    fold(Fun, Acc0, L, N, lua:next(L, N)).
 
-fold(_L, _N, _Fun, Acc, 0) -> Acc;
-fold( L,  N,  Fun, Acc, _) ->
+fold(_Fun, Acc, _L, _N, 0) -> Acc;
+fold( Fun, Acc, L,   N, _) ->
     V = toterm(L, -1), lua:remove(L, -1),
     K = toterm(L, -1),
     Acc2 = Fun(K, V, Acc),
-    fold(L, N, Fun, Acc2, lua:next(L, N)).
+    fold(Fun, Acc2, L, N, lua:next(L, N)).

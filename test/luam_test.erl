@@ -12,7 +12,7 @@ fold_test() ->
     lua:pushlstring(L, <<"2">>),
     lua:settable(L, 1),
     ?assertEqual(1, lua:gettop(L)),
-    R = luam:fold(L, 1, fun(K, V, Acc) -> [{K, V}|Acc] end, []),
+    R = luam:fold(fun(K, V, Acc) -> [{K, V}|Acc] end, [], L, 1),
     ?assertEqual(
         lists:sort([{<<"vienas">>, <<"1">>}, {<<"du">>, <<"2">>}]),
         lists:sort(R)
