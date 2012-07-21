@@ -38,7 +38,7 @@
 -type lua_type() :: nil | boolean | light_user_data | number |
         string | table | function | user_data | thread | unknown.
 
--export_type([lua/0]).
+-export_type([lua/0, index/0]).
 
 -type lua_name() :: string().
 
