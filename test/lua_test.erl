@@ -144,4 +144,3 @@ type_test_helper(Value, PushFun, Type) ->
     ?assertEqual(ok, luam:push_arg(L, Value)),
     ?assertEqual(Type, lua:type(L, 2)),
     lua:close(L).
-

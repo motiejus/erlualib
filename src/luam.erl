@@ -63,16 +63,15 @@ call(L, Args, N) ->
     lua:call(L, Len, N),
     pop_results(L, N).
 
+%% @doc Push arbitrary variable on stack
 -spec push_arg(lua:lua(), arg()) -> ok.
 push_arg(L, nil)                      -> lua:pushnil(L);
 push_arg(L, Arg) when is_boolean(Arg) -> lua:pushboolean(L, Arg);
 push_arg(L, Arg) when is_binary(Arg)  -> lua:pushlstring(L, Arg);
 push_arg(L, Arg) when is_number(Arg)  -> lua:pushnumber(L, Arg);
-
 push_arg(L, Args) when is_tuple(Args) ->
     Proplist = lists:zip(lists:seq(1, size(Args)), tuple_to_list(Args)),
     push_arg(L, Proplist);
-
 push_arg(L, Args) when is_list(Args) ->
     lua:createtable(L, length(Args), 0),
     TPos = lua:gettop(L),

@@ -39,11 +39,13 @@ push_arg_table1_test() ->
 
 push_arg_nested_table_test() ->
     {ok, L} = lua:new_state(),
-    luam:push_arg(L, {{true}}),
+    luam:push_arg(L, {{true, nil}}),
     ?assertEqual(1, lua:gettop(L)),
-    lua:pushnumber(L, 1), lua:gettable(L, 1), % push t[1]
-    lua:pushnumber(L, 1), lua:gettable(L, 2), % push inner t[1]
-    ?assertEqual(boolean, lua:type(L, -1)).
+    lua:pushnumber(L, 1), lua:gettable(L, 1),
+    lua:pushnumber(L, 1), lua:gettable(L, 2),
+    ?assertEqual(boolean, lua:type(L, -1)),
+    lua:pushnumber(L, 2), lua:gettable(L, 2),
+    ?assertEqual(nil, lua:type(L, -1)).
 
 %proplist1_test() -> sah([{1, 1}]).
 %proplist2_test() -> sah([{1,1}, {2, 2}]).
