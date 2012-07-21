@@ -86,7 +86,10 @@ luam_call_test_() ->
         {"[[{1, 4}]] -> {[{1, 4}]}", ?_assertEqual(
                 {[{1, 4}]}, luam_call([[{1, 4}]]))
         },
-        {"[1, 2] -> {1, 2}", ?_assertEqual({1, 2}, luam_call([1, 2]))}
+        {"[1, 2] -> {1, 2}", ?_assertEqual({1, 2}, luam_call([1, 2]))},
+        {"[1, []] -> {1, []}", ?_assertEqual({1, []}, luam_call([1, []]))},
+        {"[true, false, true] -> {true, false, true}", ?_assertEqual(
+                {true, false, true}, luam_call([true, false, true]))}
     ].
 
 %number_test() -> sah([1], {1}).
