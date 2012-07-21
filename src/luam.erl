@@ -134,5 +134,5 @@ fold( Fun, Acc, L,   N, _) ->
 %% function returned. Pops function from the stack.
 -spec multicall(lua:lua(), non_neg_integer()) -> non_neg_integer().
 multicall(L, N) ->
-    lua:command(L, {?ERL_LUAM_MULTICALL, N}),
-    lua:receive_valued_response().
+    lua_common:command(L, {?ERL_LUAM_MULTICALL, N}),
+    lua_common:receive_valued_response().
