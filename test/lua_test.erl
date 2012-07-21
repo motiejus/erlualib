@@ -22,7 +22,6 @@ string_type_test() -> type_test_helper(<<"foo">>, pushlstring, string).
 table_type_test() -> type_test_helper(newtable, table).
 
 ns() -> {ok, L} = lua:new_state(), L.
-
 oh_test_() ->
     [
         {"createtable", ?_test(createtable(ns()))},

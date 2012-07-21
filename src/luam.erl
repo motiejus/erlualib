@@ -41,8 +41,12 @@
 
 -module(luam).
 
--export([call/3, push_arg/2]).
+-include("lua_api.hrl").
+-include_lib("eunit/include/eunit.hrl").
+
+-export([call/3, multicall/2, push_arg/2]).
 -export([fold/4]).
+
 
 -type arg() :: binary() | % string
                atom()   | % string
@@ -56,11 +60,12 @@
                binary()  |
                list({ret(), ret()}).
 
--spec call(lua:lua(), list(arg()), non_neg_integer()) -> tuple(ret()).
-call(L, Args, N) ->
+%% @doc Call FunName with Args. Return all arguments in tuple.
+-spec call(lua:lua(), string(), list(arg())) -> tuple(ret()).
+call(L, FunName, Args) ->
+    lua:getglobal(L, FunName),
     [push_arg(L, Arg) || Arg <- Args],
-    Len = length(Args),
-    lua:call(L, Len, N),
+    N = multicall(L, length(Args)),
     pop_results(L, N).
 
 %% @doc Push arbitrary variable on stack

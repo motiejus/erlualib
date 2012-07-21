@@ -27,6 +27,8 @@
          settable/2,
          type/2]).
 
+-export([command/2, receive_valued_response/0]).
+
 -include("lua.hrl").
 -include("lua_api.hrl").
 

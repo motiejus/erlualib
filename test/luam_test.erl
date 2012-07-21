@@ -2,8 +2,19 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-fold_test() ->
-    {ok, L} = lua:new_state(),
+ns() -> {ok, L} = lua:new_state(), L.
+oh_test_() ->
+    [
+        {"fold", ?_test(fold(ns()))},
+        {"push arg empty table", ?_test(push_arg_empty_table(ns()))},
+        {"push arg table 1", ?_test(push_arg_table1(ns()))},
+        {"push arg nested table", ?_test(push_arg_nested_table(ns()))},
+        {"multicall 0", ?_test(multicall_0(ns()))},
+        {"multicall 1", ?_test(multicall_1(ns()))},
+        {"multicall 2", ?_test(multicall_2(ns()))}
+    ].
+
+fold(L) ->
     lua:createtable(L, 0, 2),
     lua:pushlstring(L, <<"vienas">>),
     lua:pushlstring(L, <<"1">>),
@@ -19,14 +30,12 @@ fold_test() ->
     ),
     ?assertEqual(1, lua:gettop(L)).
 
-push_arg_empty_table_test() ->
-    {ok, L} = lua:new_state(),
+push_arg_empty_table(L) ->
     luam:push_arg(L, {}),
     ?assertEqual(1, lua:gettop(L)),
     ?assertEqual(0, lua:objlen(L, 1)).
 
-push_arg_table1_test() ->
-    {ok, L} = lua:new_state(),
+push_arg_table1(L) ->
     luam:push_arg(L, {true, {}, <<"yadda">>}),
     ?assertEqual(1, lua:gettop(L)),
     ?assertEqual(3, lua:objlen(L, 1)),
@@ -37,8 +46,7 @@ push_arg_table1_test() ->
     lua:pushnumber(L, 3), lua:gettable(L, 1), % push t[3]
     ?assertEqual(string, lua:type(L, 4)).
 
-push_arg_nested_table_test() ->
-    {ok, L} = lua:new_state(),
+push_arg_nested_table(L) ->
     luam:push_arg(L, {{true, nil}}),
     ?assertEqual(1, lua:gettop(L)),
     lua:pushnumber(L, 1), lua:gettable(L, 1),
@@ -86,10 +94,9 @@ nil_test() -> sah([nil], {nil}).
 %atom_test() -> sah(hiho, <<"hiho">>).
 %
 %%% @doc Single Arg Helper
-%sah(Val) ->
-%    sah(Val, Val).
-%sah(Val, Expect) ->
-%    {ok, L} = lua:new_state(),
-%    lual:dostring(L, <<"function t(c) return c end">>),
-%    ?assertEqual(Expect, lual:call(L, "t", [Val], 1)),
-%    lua:close(L).
+sah(Val) -> sah(Val, Val).
+sah(Val, Expect) ->
+    {ok, L} = lua:new_state(),
+    ok = lual:dostring(L, <<"function t(...) return ... end">>),
+    ?assertEqual(Expect, luam:call(L, "t", Val)),
+    lua:close(L).
