@@ -21,15 +21,26 @@ num_type_test() -> type_test_helper(1, pushinteger, number).
 string_type_test() -> type_test_helper(<<"foo">>, pushlstring, string).
 table_type_test() -> type_test_helper(newtable, table).
 
-createtable_test() ->
-    {ok, L} = lua:new_state(),
+ns() -> {ok, L} = lua:new_state(), L.
+
+oh_test_() ->
+    [
+        {"createtable", ?_test(createtable(ns()))},
+        {"settable", ?_test(settable(ns()))},
+        {"gettable", ?_test(gettable(ns()))},
+        {"remove", ?_test(remove(ns()))},
+        {"setfield, getfield", ?_test(set_get_field(ns()))},
+        {"concat", ?_test(concat(ns()))},
+        {"call", ?_test(call(ns()))},
+        {"setglobal, getglobal", ?_test(set_get_global(ns()))}
+    ].
+
+createtable(L) ->
     ?assertEqual(ok, lua:createtable(L, 0, 2)),
     ?assertEqual(table, lua:type(L, 1)),
-    ?assertEqual(0, lua:objlen(L, 1)),
-    lua:close(L).
+    ?assertEqual(0, lua:objlen(L, 1)).
 
-settable_test() ->
-    {ok, L} = lua:new_state(),
+settable(L) ->
     ?assertEqual(ok, lua:newtable(L)),
     lua:pushlstring(L, <<"x">>),
     lua:pushlstring(L, <<"y">>),
@@ -39,27 +50,22 @@ settable_test() ->
     lua:getfield(L, 1, "x"),
     ?assertEqual(<<"y">>, lua:tolstring(L, -1)).
 
-gettable_test() ->
-    {ok, L} = lua:new_state(),
+gettable(L) ->
     lua:newtable(L),
     lua:pushnumber(L, 2),
     lua:pushnumber(L, 3),
     lua:settable(L, 1), % t[2] = 3
     lua:pushnumber(L, 2),
     lua:gettable(L, -2), % push t[2] to top
-    ?assertEqual(3, lua:tonumber(L, -1)),
-    lua:close(L).
+    ?assertEqual(3, lua:tonumber(L, -1)).
 
-remove_test() ->
-    {ok, L} = lua:new_state(),
+remove(L) ->
     lua:pushnumber(L, 1),
     ?assertEqual(1, lua:gettop(L)),
     ?assertEqual(ok, lua:remove(L, 1)),
-    ?assertEqual(0, lua:gettop(L)),
-    lua:close(L).
+    ?assertEqual(0, lua:gettop(L)).
 
-set_get_field_test() ->
-    {ok, L} = lua:new_state(),
+set_get_field(L) ->
     lua:newtable(L),
     lua:pushboolean(L, true),
     ?assertEqual(table, lua:type(L, 1)),
@@ -69,8 +75,7 @@ set_get_field_test() ->
     ?assertEqual(ok, lua:getfield(L, 1, "foo")),
     ?assertEqual(true, lua:toboolean(L, 2)).
 
-concat_test() ->
-    {ok, L} = lua:new_state(),
+concat(L) ->
     lua:pushlstring(L, <<"ya">>),
     ?assertEqual(2, lua:objlen(L, 1)),
     lua:pushlstring(L, <<"dda">>),
@@ -79,22 +84,18 @@ concat_test() ->
     ?assertEqual(<<"yadda">>, lua:tolstring(L, 1)),
     ?assertEqual(5, lua:objlen(L, 1)).
 
-call_test() ->
-    {ok, L} = lua:new_state(),
+call(L) ->
     ?assertEqual(ok, lua:getfield(L, global, "type")),
     ?assertEqual(function, lua:type(L, 1)),
     ?assertEqual(ok, lua:pushnumber(L, 1)),
     ?assertEqual(ok, lua:call(L, 1, 1)),
-    ?assertEqual(<<"number">>, lua:tolstring(L, 1)),
-    lua:close(L).
+    ?assertEqual(<<"number">>, lua:tolstring(L, 1)).
     
-set_get_global_test() ->
-    {ok, L} = lua:new_state(),
+set_get_global(L) ->
     ?assertEqual(ok, lua:pushnumber(L, 23)),
     ?assertEqual(ok, lua:setfield(L, global, "foo")),
     ?assertEqual(ok, lua:getfield(L, global, "foo")),
-    ?assertEqual(23, lua:tonumber(L, 1)),
-    lua:close(L).
+    ?assertEqual(23, lua:tonumber(L, 1)).
 
 %% =============================================================================
 %% Helpers
