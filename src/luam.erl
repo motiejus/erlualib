@@ -62,28 +62,32 @@ call(L, Fun, Args, N) ->
     lua:call(L, Fun, length(Args), N),
     pop_results(L).
 
-
-push_args(L, nil) ->
+-spec push_arg(lua:lua(), arg()) -> ok.
+push_arg(L, nil) ->
     lua:pushnil(L);
-push_args(L, Arg) when is_boolean(Arg) ->
+push_arg(L, Arg) when is_boolean(Arg) ->
     lua:pushboolean(L, Arg);
-push_args(L, Arg) when is_binary(Arg) ->
+push_arg(L, Arg) when is_binary(Arg) ->
     lua:pushlstring(L, Arg);
-push_args(L, Arg) when is_number(Arg) ->
+push_arg(L, Arg) when is_number(Arg) ->
     lua:pushnumber(L, Arg);
-push_args(L, Args) when is_tuple(Args) ->
+push_arg(L, Args) when is_tuple(Args) ->
     lua:createtable(L, size(Args), 0),
     TPos = lua:gettop(L), % table position we have just created
     Fun = fun({I, Arg}) ->
             lua:pushnumber(L, I),
-            push_args(L, Arg),
+            push_arg(L, Arg),
             lua:settable(L, TPos)
     end,
     lists:foreach(Fun, lists:zip(
             lists:seq(1, size(Args)),
             tuple_to_list(Args))
-    ).
+    );
+push_arg(L, Args) when is_list(Args) ->
+    throw(not_implemented).
 
+%% @doc Pops N results from the stack and returns result tuple
+-spec pop_results(lua:lua(), pos_integer()) -> tuple().
 pop_results(L, N) ->
     list_to_tuple(
         [pop_result(L) || _ <- lists:seq(1, N)]
