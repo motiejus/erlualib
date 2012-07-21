@@ -41,14 +41,14 @@
 
 -module(luam).
 
--export([call/4, push_args/2]).
+-export([call/3, push_arg/2]).
+-export([foreach/4]).
 
 -type arg() :: binary() | % string
                atom()   | % string
                number() | % number
                list()   | % table
                tuple().   % table
--type args() :: [arg(), ...].
 
 -type ret() :: nil       |
                boolean() |
@@ -56,11 +56,12 @@
                binary()  |
                list({ret(), ret()}).
 
--spec call(lua:lua(), string(), args(), pos_integer()) -> ret().
-call(L, Fun, Args, N) ->
-    push_args(L, Args),
-    lua:call(L, Fun, length(Args), N),
-    pop_results(L).
+-spec call(lua:lua(), list(arg()), non_neg_integer()) -> tuple(ret()).
+call(L, Args, N) ->
+    [push_arg(L, Arg) || Arg <- Args],
+    Len = length(Args),
+    lua:call(L, Len, N),
+    pop_results(L, N).
 
 -spec push_arg(lua:lua(), arg()) -> ok.
 push_arg(L, nil) ->
@@ -89,17 +90,36 @@ push_arg(L, Args) when is_list(Args) ->
 %% @doc Pops N results from the stack and returns result tuple
 -spec pop_results(lua:lua(), pos_integer()) -> tuple().
 pop_results(L, N) ->
-    list_to_tuple(
-        [pop_result(L) || _ <- lists:seq(1, N)]
-    ).
+    MapFun = fun(_) -> R = toterm(L, -1), lua:remove(L, -1), R end,
+    list_to_tuple(lists:map(MapFun, lists:seq(1, N))).
 
-%% @doc Returns 1 element from the stack
--spec pop_result(lua:lua()) -> ret().
-pop_result(L) ->
-    case lua:type(L, -1) of
+%% @doc Returns Nth element on the stack (does not pop)
+-spec toterm(lua:lua(), lua:index()) -> ret().
+toterm(L, N) ->
+    case lua:type(L, N) of
         nil -> nil;
-        boolean -> lua:toboolean(L, -1);
-        number -> lua:tonumber(L, -1);
-        string -> lua:tolstring(L, -1);
-        table -> ok
+        boolean -> lua:toboolean(L, N);
+        number -> lua:tonumber(L, N);
+        string -> lua:tolstring(L, N);
+        table ->
+            F = fun(K, V, Acc) -> [{K, V}|Acc] end,
+            lists:reverse(foreach(L, N, F, []))
     end.
+
+%% @doc Call Fun over table on index N
+-spec foreach(lua:lua(), N :: lua:index(), Fun, Acc0) -> Acc1 when
+      Fun :: fun((ret(), ret(), AccIn) -> AccOut),
+      Acc0 :: term(),
+      Acc1 :: term(),
+      AccIn :: term(),
+      AccOut :: term().
+foreach(L, N, Fun, Acc0) ->
+    lua:pushnil(L),
+    foreach(L, N, Fun, Acc0, lua:next(L, N)).
+
+foreach(_L, _N, _Fun, Acc, 0) -> Acc;
+foreach( L,  N,  Fun, Acc, _) ->
+    V = toterm(L, -1), lua:remove(L, -1),
+    K = toterm(L, -1),
+    Acc2 = Fun(K, V, Acc),
+    foreach(L, N, Fun, Acc2, lua:next(L, N)).

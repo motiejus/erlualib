@@ -2,9 +2,26 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-push_args_empty_table_test() ->
+foreach_test() ->
     {ok, L} = lua:new_state(),
-    luam:push_args(L, {}),
+    lua:createtable(L, 0, 2),
+    lua:pushlstring(L, <<"vienas">>),
+    lua:pushlstring(L, <<"1">>),
+    lua:settable(L, 1),
+    lua:pushlstring(L, <<"du">>),
+    lua:pushlstring(L, <<"2">>),
+    lua:settable(L, 1),
+    ?assertEqual(1, lua:gettop(L)),
+    R = luam:foreach(L, 1, fun(K, V, Acc) -> [{K, V}|Acc] end, []),
+    ?assertEqual(
+        lists:sort([{<<"vienas">>, <<"1">>}, {<<"du">>, <<"2">>}]),
+        lists:sort(R)
+    ),
+    ?assertEqual(1, lua:gettop(L)).
+
+push_arg_empty_table_test() ->
+    {ok, L} = lua:new_state(),
+    luam:push_arg(L, {}),
     ?assertEqual(1, lua:gettop(L)),
     ?assertEqual(0, lua:objlen(L, 1)).
 
