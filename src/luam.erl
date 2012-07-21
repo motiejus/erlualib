@@ -66,6 +66,7 @@ call(L, FunName, Args) ->
     lua:getglobal(L, FunName),
     [push_arg(L, Arg) || Arg <- Args],
     N = multicall(L, length(Args)),
+    error_logger:format("Yoda: ~p~n", [lua:gettop(L)]), timer:sleep(100),
     pop_results(L, N).
 
 %% @doc Push arbitrary variable on stack
@@ -101,7 +102,7 @@ pop_results(L, N) ->
 %% @doc Returns Nth element on the stack. [-0, +0]
 -spec toterm(lua:lua(), lua:index()) -> ret().
 toterm(L, N) ->
-    case lua:type(L, N) of
+    case ?debugVal(lua:type(L, N)) of
         nil -> nil;
         boolean -> lua:toboolean(L, N);
         number -> lua:tonumber(L, N);
