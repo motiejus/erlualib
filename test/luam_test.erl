@@ -78,8 +78,9 @@ multicall_2(L) ->
 luam_call_test_() ->
     [
         {"[nil] -> {nil}", ?_assertEqual({nil}, luam_call([nil]))},
-        {"[1] -> {1}", ?_assertEqual({nil}, luam_call([nil]))}
-        %{"[{1, 1}]", ?_assertEqual([{1, 1}], luam_call([{1, 1}]))}
+        {"[1] -> {1}", ?_assertEqual({nil}, luam_call([nil]))},
+        {"[[{1, 4}]] -> {[{1, 4}]}",
+            ?_assertEqual({[{1, 4}]}, luam_call([[{1, 4}]]))}
     ].
 
 %number_test() -> sah([1], {1}).

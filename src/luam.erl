@@ -90,7 +90,11 @@ push_arg(L, Args) when is_list(Args) ->
 %% @doc Pop N results from the stack and return result tuple
 -spec pop_results(lua:lua(), pos_integer()) -> tuple().
 pop_results(L, N) ->
-    MapFun = fun(_) -> R = toterm(L, -1), lua:remove(L, -1), R end,
+    MapFun = fun(_) ->
+            R = toterm(L, lua:gettop(L)),
+            lua:remove(L, -1),
+            R
+    end,
     list_to_tuple(lists:map(MapFun, lists:seq(1, N))).
 
 %% @doc Returns Nth element on the stack (does not pop)
@@ -106,7 +110,7 @@ toterm(L, N) ->
             lists:reverse(fold(F, [], L, N))
     end.
 
-%% @doc Call Fun over table on index N
+%% @doc Call Fun over table on index N. Does not remove table.
 -spec fold(Fun, Acc0, lua:lua(), N :: lua:index()) -> Acc1 when
       Fun :: fun((ret(), ret(), AccIn) -> AccOut),
       Acc0 :: term(),
