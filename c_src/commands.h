@@ -138,5 +138,7 @@
 #define ERL_LUAL_UNREF             132
 #define ERL_LUAL_WHERE             133
 
+#define ERL_LUAM_MULTICALL         200
+
 #define ATOM_OK driver_mk_atom("ok")
 #define ATOM_ERROR driver_mk_atom("error")

@@ -22,7 +22,6 @@ string_type_test() -> type_test_helper(<<"foo">>, pushlstring, string).
 table_type_test() -> type_test_helper(newtable, table).
 
 ns() -> {ok, L} = lua:new_state(), L.
-
 oh_test_() ->
     [
         {"createtable", ?_test(createtable(ns()))},
@@ -125,6 +124,9 @@ push_to_helper(Val, Push, To) ->
     {ok, L} = lua:new_state(),
     ?assertEqual(ok, lua:Push(L, Val)),
     ?assertEqual(Val, lua:To(L, 1)),
+    % Test luam:push_arg/2
+    ?assertEqual(ok, luam:push_arg(L, Val)),
+    ?assertEqual(Val, lua:To(L, 2)),
     lua:close(L).
 
 type_test_helper(PushFun, Type) ->
@@ -137,5 +139,7 @@ type_test_helper(Value, PushFun, Type) ->
     {ok, L} = lua:new_state(),
     ?assertEqual(ok, lua:PushFun(L, Value)),
     ?assertEqual(Type, lua:type(L, 1)),
+    % Test luam:push_arg/2
+    ?assertEqual(ok, luam:push_arg(L, Value)),
+    ?assertEqual(Type, lua:type(L, 2)),
     lua:close(L).
-

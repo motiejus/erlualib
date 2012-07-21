@@ -27,6 +27,8 @@
          settable/2,
          type/2]).
 
+-export([command/2, receive_valued_response/0]).
+
 -include("lua.hrl").
 -include("lua_api.hrl").
 
@@ -38,7 +40,7 @@
 -type lua_type() :: nil | boolean | light_user_data | number |
         string | table | function | user_data | thread | unknown.
 
--export_type([lua/0]).
+-export_type([lua/0, index/0, abs_index/0]).
 
 -type lua_name() :: string().
 
@@ -88,7 +90,7 @@ newtable(L) ->
     command(L, {?ERL_LUA_NEWTABLE}),
     receive_simple_response().
 
--spec next(lua(), index()) -> ok.
+-spec next(lua(), index()) -> integer().
 next(L, Index) ->
     command(L, {?ERL_LUA_NEXT, Index}),
     receive_valued_response().

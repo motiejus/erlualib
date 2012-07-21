@@ -154,6 +154,9 @@ process(ErlDrvData handle, ErlIOVec *ev)
   case ERL_LUAL_DOSTRING:
     erl_lual_dostring(driver_data, buf, index);
     break;
+  case ERL_LUAM_MULTICALL:
+    erl_luam_multicall(driver_data, buf, index);
+    break;
   
   default:
     erl_lua_no_command(driver_data);
