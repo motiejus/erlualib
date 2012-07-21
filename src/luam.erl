@@ -111,7 +111,7 @@ toterm(L, N) ->
     end.
 
 %% @doc Call Fun over table on index N. Does not remove table.
--spec fold(Fun, Acc0, lua:lua(), N :: lua:index()) -> Acc1 when
+-spec fold(Fun, Acc0, lua:lua(), N :: lua:abs_index()) -> Acc1 when
       Fun :: fun((ret(), ret(), AccIn) -> AccOut),
       Acc0 :: term(),
       Acc1 :: term(),
@@ -130,8 +130,8 @@ fold( Fun, Acc, L,   N, _) ->
 
 %% @doc Call function and return how many arguments it returned
 %%
-%% Level is the index of the function on stack minus 1.
--spec multicall(lua:lua(), non_neg_integer()) -> non_neg_integer().
-multicall(L, Level) ->
-    lua:command(L, {?ERL_LUAM_MULTICALL, Level}),
+%% Index is the callable function index
+-spec multicall(lua:lua(), lua:index()) -> non_neg_integer().
+multicall(L, Index) ->
+    lua:command(L, {?ERL_LUAM_MULTICALL, Index}),
     lua:receive_valued_response().
