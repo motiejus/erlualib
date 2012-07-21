@@ -57,9 +57,9 @@
                list({ret(), ret()}).
 
 -spec call(lua:lua(), string(), args(), pos_integer()) -> ret().
-call(L, Fun, Args, 1) ->
+call(L, Fun, Args, N) ->
     push_args(L, Args),
-    lua:call(L, Fun, length(Args), 1),
+    lua:call(L, Fun, length(Args), N),
     pop_results(L).
 
 
@@ -84,5 +84,18 @@ push_args(L, Args) when is_tuple(Args) ->
             tuple_to_list(Args))
     ).
 
-pop_results(_) ->
-    ok.
+pop_results(L, N) ->
+    list_to_tuple(
+        [pop_result(L) || _ <- lists:seq(1, N)]
+    ).
+
+%% @doc Returns 1 element from the stack
+-spec pop_result(lua:lua()) -> ret().
+pop_result(L) ->
+    case lua:type(L, -1) of
+        nil -> nil;
+        boolean -> lua:toboolean(L, -1);
+        number -> lua:tonumber(L, -1);
+        string -> lua:tolstring(L, -1);
+        table -> ok
+    end.
