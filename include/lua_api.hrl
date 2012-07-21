@@ -137,3 +137,9 @@
 -define(ERL_LUAL_TYPERROR,          131).
 -define(ERL_LUAL_UNREF,             132).
 -define(ERL_LUAL_WHERE,             133).
+
+%% Motiejaus Lua constants
+-define(ERL_LUAM_MULTICALL,         200).
+
+% Constants
+-define(ERL_LUA_MULTRET,            -1).

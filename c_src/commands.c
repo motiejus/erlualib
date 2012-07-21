@@ -395,6 +395,26 @@ erl_lual_dostring(lua_drv_t *driver_data, char *buf, int index)
     reply_error(driver_data);
 }
 
+void
+erl_luam_multicall(lua_drv_t *driver_data, char *buf, int index)
+{
+  long args, level, ret_results;
+  ei_decode_long(buf, &index, &args);
+
+  /* level := function's index - 1 */
+  level = lua_gettop(driver_data->L) - args - 1;
+
+  lua_call(driver_data->L, args, LUA_MULTRET);
+
+  ret_results = lua_gettop(driver_data->L) - level;
+  ErlDrvTermData spec[] = {
+        ERL_DRV_ATOM,   ATOM_OK,
+        ERL_DRV_INT, (ErlDrvTermData) ret_results,
+        ERL_DRV_TUPLE,  2
+  };
+  driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
+}
+
 
 void
 erl_lua_no_command(lua_drv_t *driver_data)

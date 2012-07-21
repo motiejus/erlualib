@@ -118,3 +118,12 @@ fold( Fun, Acc, L,   N, _) ->
     K = toterm(L, -1),
     Acc2 = Fun(K, V, Acc),
     fold(Fun, Acc2, L, N, lua:next(L, N)).
+
+%% @doc Call function and return how many arguments it returned
+%%
+%% Level is the index of the function on stack minus 1.
+-spec multicall(lua:lua(), non_neg_integer()) ->
+    {ok, non_neg_integer()} | {error, _}.
+multicall(L, Level) ->
+    lua:command(L, {?ERL_LUAM_MULTICALL, Level}),
+    lua:receive_valued_response().

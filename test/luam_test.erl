@@ -47,6 +47,28 @@ push_arg_nested_table_test() ->
     lua:pushnumber(L, 2), lua:gettable(L, 2),
     ?assertEqual(nil, lua:type(L, -1)).
 
+multicall_0(L) ->
+    ok = lual:dostring(L, <<"function t(...) local noop end">>),
+    lua:getglobal(L, "t"),
+    ?assertEqual(0, luam:multicall(L, 0)).
+
+multicall_1(L) ->
+    ok = lual:dostring(L, <<"function t(...) return (1) end">>),
+    lua:getglobal(L, "t"),
+    ?assertEqual(1, luam:multicall(L, 0)),
+    ?assertEqual(1, lua:gettop(L)),
+    ?assertEqual(number, lua:type(L, -1)). % return value
+
+multicall_2(L) ->
+    ok = lual:dostring(L, <<"function t(...) return 1, 2 end">>),
+    lua:getglobal(L, "t"),
+    ?assertEqual(2, luam:multicall(L, 0)),
+    ?assertEqual(2, lua:gettop(L)),
+    ?assertEqual(number, lua:type(L, -1)), % return value
+    ?assertEqual(number, lua:type(L, -2)). % return value
+
+number_test() -> sah([1], {1}).
+nil_test() -> sah([nil], {nil}).
 %proplist1_test() -> sah([{1, 1}]).
 %proplist2_test() -> sah([{1,1}, {2, 2}]).
 %proplist3a_test() -> sah([{1,1},{2,<<"x">>}]).
