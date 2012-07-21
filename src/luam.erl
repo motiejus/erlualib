@@ -42,7 +42,7 @@
 -module(luam).
 
 -export([call/3, push_arg/2]).
--export([foreach/4]).
+-export([fold/4]).
 
 -type arg() :: binary() | % string
                atom()   | % string
@@ -103,23 +103,23 @@ toterm(L, N) ->
         string -> lua:tolstring(L, N);
         table ->
             F = fun(K, V, Acc) -> [{K, V}|Acc] end,
-            lists:reverse(foreach(L, N, F, []))
+            lists:reverse(fold(L, N, F, []))
     end.
 
 %% @doc Call Fun over table on index N
--spec foreach(lua:lua(), N :: lua:index(), Fun, Acc0) -> Acc1 when
+-spec fold(lua:lua(), N :: lua:index(), Fun, Acc0) -> Acc1 when
       Fun :: fun((ret(), ret(), AccIn) -> AccOut),
       Acc0 :: term(),
       Acc1 :: term(),
       AccIn :: term(),
       AccOut :: term().
-foreach(L, N, Fun, Acc0) ->
+fold(L, N, Fun, Acc0) ->
     lua:pushnil(L),
-    foreach(L, N, Fun, Acc0, lua:next(L, N)).
+    fold(L, N, Fun, Acc0, lua:next(L, N)).
 
-foreach(_L, _N, _Fun, Acc, 0) -> Acc;
-foreach( L,  N,  Fun, Acc, _) ->
+fold(_L, _N, _Fun, Acc, 0) -> Acc;
+fold( L,  N,  Fun, Acc, _) ->
     V = toterm(L, -1), lua:remove(L, -1),
     K = toterm(L, -1),
     Acc2 = Fun(K, V, Acc),
-    foreach(L, N, Fun, Acc2, lua:next(L, N)).
+    fold(L, N, Fun, Acc2, lua:next(L, N)).

@@ -2,7 +2,7 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-foreach_test() ->
+fold_test() ->
     {ok, L} = lua:new_state(),
     lua:createtable(L, 0, 2),
     lua:pushlstring(L, <<"vienas">>),
@@ -12,7 +12,7 @@ foreach_test() ->
     lua:pushlstring(L, <<"2">>),
     lua:settable(L, 1),
     ?assertEqual(1, lua:gettop(L)),
-    R = luam:foreach(L, 1, fun(K, V, Acc) -> [{K, V}|Acc] end, []),
+    R = luam:fold(L, 1, fun(K, V, Acc) -> [{K, V}|Acc] end, []),
     ?assertEqual(
         lists:sort([{<<"vienas">>, <<"1">>}, {<<"du">>, <<"2">>}]),
         lists:sort(R)
