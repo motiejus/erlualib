@@ -81,8 +81,12 @@ luam_call_test_() ->
     [
         {"[nil] -> {nil}", ?_assertEqual({nil}, luam_call([nil]))},
         {"[1] -> {1}", ?_assertEqual({nil}, luam_call([nil]))},
-        {"[[{1, 4}]] -> {[{1, 4}]}",
-            ?_assertEqual({[{1, 4}]}, luam_call([[{1, 4}]]))}
+        {"[4, <<\"bac\">>] -> {4, <<\"bac\">>}", ?_assertEqual(
+                {4, <<"bac">>}, luam_call([4, <<"bac">>]))},
+        {"[[{1, 4}]] -> {[{1, 4}]}", ?_assertEqual(
+                {[{1, 4}]}, luam_call([[{1, 4}]]))
+        },
+        {"[1, 2] -> {1, 2}", ?_assertEqual({1, 2}, luam_call([1, 2]))}
     ].
 
 %number_test() -> sah([1], {1}).
