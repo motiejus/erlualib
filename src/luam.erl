@@ -87,7 +87,7 @@ push_arg(L, Args) when is_list(Args) ->
     end,
     lists:foreach(Fun, Args).
 
-%% @doc Pop N results from the stack and return result tuple
+%% @doc Pop N results from the stack and return result tuple. [-N, +0]
 -spec pop_results(lua:lua(), pos_integer()) -> tuple().
 pop_results(L, N) ->
     MapFun = fun(_) ->
@@ -97,7 +97,7 @@ pop_results(L, N) ->
     end,
     list_to_tuple(lists:map(MapFun, lists:seq(1, N))).
 
-%% @doc Returns Nth element on the stack (does not pop)
+%% @doc Returns Nth element on the stack. [-0, +0]
 -spec toterm(lua:lua(), lua:index()) -> ret().
 toterm(L, N) ->
     case lua:type(L, N) of
@@ -110,7 +110,7 @@ toterm(L, N) ->
             lists:reverse(fold(F, [], L, N))
     end.
 
-%% @doc Call Fun over table on index N. Does not remove table.
+%% @doc Call Fun over table on absolute index N. [-0, +0].
 -spec fold(Fun, Acc0, lua:lua(), N :: lua:abs_index()) -> Acc1 when
       Fun :: fun((ret(), ret(), AccIn) -> AccOut),
       Acc0 :: term(),
@@ -128,10 +128,11 @@ fold( Fun, Acc, L,   N, _) ->
     Acc2 = Fun(K, V, Acc),
     fold(Fun, Acc2, L, N, lua:next(L, N)).
 
-%% @doc Call function and return how many arguments it returned
+%% @doc Call function and retrieve its all arguments. [-(N+1), +M]
 %%
-%% Index is the callable function index
--spec multicall(lua:lua(), lua:index()) -> non_neg_integer().
-multicall(L, Index) ->
-    lua:command(L, {?ERL_LUAM_MULTICALL, Index}),
+%% Equivalent to lua:call(L, N, LUA_MULTRET), but returns how many arguments
+%% function returned. Pops function from the stack.
+-spec multicall(lua:lua(), non_neg_integer()) -> non_neg_integer().
+multicall(L, N) ->
+    lua:command(L, {?ERL_LUAM_MULTICALL, N}),
     lua:receive_valued_response().

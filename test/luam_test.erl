@@ -58,7 +58,9 @@ push_arg_nested_table(L) ->
 multicall_0(L) ->
     ok = lual:dostring(L, <<"function t(...) local noop end">>),
     lua:getglobal(L, "t"),
-    ?assertEqual(0, luam:multicall(L, 0)).
+    ?assertEqual(0, luam:multicall(L, 0)),
+    ?assertEqual(0, lua:gettop(L)).
+
 
 multicall_1(L) ->
     ok = lual:dostring(L, <<"function t(...) return (1) end">>),
