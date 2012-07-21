@@ -75,8 +75,15 @@ multicall_2(L) ->
     ?assertEqual(number, lua:type(L, -1)), % return value
     ?assertEqual(number, lua:type(L, -2)). % return value
 
-number_test() -> sah([1], {1}).
-nil_test() -> sah([nil], {nil}).
+luam_call_test_() ->
+    [
+        {"[nil] -> {nil}", ?_assertEqual({nil}, luam_call([nil]))},
+        {"[1] -> {1}", ?_assertEqual({nil}, luam_call([nil]))}
+        %{"[{1, 1}]", ?_assertEqual([{1, 1}], luam_call([{1, 1}]))}
+    ].
+
+%number_test() -> sah([1], {1}).
+%nil_test() -> sah([nil], {nil}).
 %proplist1_test() -> sah([{1, 1}]).
 %proplist2_test() -> sah([{1,1}, {2, 2}]).
 %proplist3a_test() -> sah([{1,1},{2,<<"x">>}]).
@@ -93,10 +100,10 @@ nil_test() -> sah([nil], {nil}).
 %binary_test() -> sah(<<"hiho">>).
 %atom_test() -> sah(hiho, <<"hiho">>).
 %
-%%% @doc Single Arg Helper
-sah(Val) -> sah(Val, Val).
-sah(Val, Expect) ->
+
+luam_call(Args) ->
     {ok, L} = lua:new_state(),
     ok = lual:dostring(L, <<"function t(...) return ... end">>),
-    ?assertEqual(Expect, luam:call(L, "t", Val)),
-    lua:close(L).
+    R = luam:call(L, "t", Args),
+    lua:close(L),
+    R.
