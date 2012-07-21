@@ -64,28 +64,24 @@ call(L, Args, N) ->
     pop_results(L, N).
 
 -spec push_arg(lua:lua(), arg()) -> ok.
-push_arg(L, nil) ->
-    lua:pushnil(L);
-push_arg(L, Arg) when is_boolean(Arg) ->
-    lua:pushboolean(L, Arg);
-push_arg(L, Arg) when is_binary(Arg) ->
-    lua:pushlstring(L, Arg);
-push_arg(L, Arg) when is_number(Arg) ->
-    lua:pushnumber(L, Arg);
+push_arg(L, nil)                      -> lua:pushnil(L);
+push_arg(L, Arg) when is_boolean(Arg) -> lua:pushboolean(L, Arg);
+push_arg(L, Arg) when is_binary(Arg)  -> lua:pushlstring(L, Arg);
+push_arg(L, Arg) when is_number(Arg)  -> lua:pushnumber(L, Arg);
+
 push_arg(L, Args) when is_tuple(Args) ->
-    lua:createtable(L, size(Args), 0),
-    TPos = lua:gettop(L), % table position we have just created
-    Fun = fun({I, Arg}) ->
-            lua:pushnumber(L, I),
-            push_arg(L, Arg),
+    Proplist = lists:zip(lists:seq(1, size(Args)), tuple_to_list(Args)),
+    push_arg(L, Proplist);
+
+push_arg(L, Args) when is_list(Args) ->
+    lua:createtable(L, length(Args), 0),
+    TPos = lua:gettop(L),
+    Fun = fun({K, V}) ->
+            push_arg(L, K),
+            push_arg(L, V),
             lua:settable(L, TPos)
     end,
-    lists:foreach(Fun, lists:zip(
-            lists:seq(1, size(Args)),
-            tuple_to_list(Args))
-    );
-push_arg(_L, Args) when is_list(Args) ->
-    throw(not_implemented).
+    lists:foreach(Fun, Args).
 
 %% @doc Pop N results from the stack and return result tuple
 -spec pop_results(lua:lua(), pos_integer()) -> tuple().
