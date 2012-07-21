@@ -32,7 +32,8 @@ oh_test_() ->
         {"setfield, getfield", ?_test(set_get_field(ns()))},
         {"concat", ?_test(concat(ns()))},
         {"call", ?_test(call(ns()))},
-        {"setglobal, getglobal", ?_test(set_get_global(ns()))}
+        {"setglobal, getglobal", ?_test(set_get_global(ns()))},
+        {"next", ?_test(next(ns()))}
     ].
 
 createtable(L) ->
@@ -96,6 +97,25 @@ set_get_global(L) ->
     ?assertEqual(ok, lua:setfield(L, global, "foo")),
     ?assertEqual(ok, lua:getfield(L, global, "foo")),
     ?assertEqual(23, lua:tonumber(L, 1)).
+
+next(L) ->
+    createtable(L),
+    lua:pushlstring(L, <<"vienas">>),
+    lua:pushlstring(L, <<"1">>),
+    lua:settable(L, 1),
+    lua:pushlstring(L, <<"du">>),
+    lua:pushlstring(L, <<"2">>),
+    lua:settable(L, 1),
+    ?assertEqual(1, lua:gettop(L)),
+    lua:pushnil(L),
+    ?assertNotEqual(0, lua:next(L, 1)),
+    ?assertEqual(<<"2">>, lua:tolstring(L, -1)), lua:remove(L, -1),
+    ?assertEqual(<<"du">>, lua:tolstring(L, -1)),
+    ?assertNotEqual(0, lua:next(L, 1)),
+    ?assertEqual(<<"1">>, lua:tolstring(L, -1)), lua:remove(L, -1),
+    ?assertEqual(<<"vienas">>, lua:tolstring(L, -1)),
+    ?assertEqual(0, lua:next(L, 1)).
+
 
 %% =============================================================================
 %% Helpers

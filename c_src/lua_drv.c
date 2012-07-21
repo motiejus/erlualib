@@ -90,6 +90,9 @@ process(ErlDrvData handle, ErlIOVec *ev)
   case ERL_LUA_NEWTABLE:
     erl_lua_newtable(driver_data, buf, index);
     break;
+  case ERL_LUA_NEXT:
+    erl_lua_next(driver_data, buf, index);
+    break;
   case ERL_LUA_OBJLEN:
     erl_lua_objlen(driver_data, buf, index);
     break;

@@ -76,6 +76,24 @@ erl_lua_newtable(lua_drv_t *driver_data, char *buf, int index)
 }
 
 void
+erl_lua_next(lua_drv_t *driver_data, char *buf, int index)
+{
+  long i;
+  int ret;
+
+  ei_decode_long(buf, &index, &i);
+
+  ret = lua_next(driver_data->L, i);
+
+  ErlDrvTermData spec[] = {
+        ERL_DRV_ATOM,   ATOM_OK,
+        ERL_DRV_INT, (ErlDrvTermData) ret,
+        ERL_DRV_TUPLE,  2
+  };
+  driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
+}
+
+void
 erl_lua_getfield(lua_drv_t *driver_data, char *buf, int index)
 {
   long i;

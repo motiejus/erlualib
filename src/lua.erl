@@ -10,6 +10,7 @@
          gettable/2,
          gettop/1,
          newtable/1,
+         next/2,
          objlen/2,
          pushboolean/2,
          pushinteger/2,
@@ -86,6 +87,11 @@ gettop(L) ->
 newtable(L) ->
     command(L, {?ERL_LUA_NEWTABLE}),
     receive_simple_response().
+
+-spec next(lua(), index()) -> ok.
+next(L, Index) ->
+    command(L, {?ERL_LUA_NEXT, Index}),
+    receive_valued_response().
 
 -spec objlen(lua(), index()) -> non_neg_integer().
 objlen(L, Index) ->
