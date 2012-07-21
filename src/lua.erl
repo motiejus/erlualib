@@ -88,7 +88,7 @@ newtable(L) ->
     command(L, {?ERL_LUA_NEWTABLE}),
     receive_simple_response().
 
--spec next(lua(), index()) -> ok.
+-spec next(lua(), index()) -> integer().
 next(L, Index) ->
     command(L, {?ERL_LUA_NEXT, Index}),
     receive_valued_response().
