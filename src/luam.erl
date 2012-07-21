@@ -72,6 +72,7 @@ call(L, FunName, Args) ->
 -spec push_arg(lua:lua(), arg()) -> ok.
 push_arg(L, nil)                      -> lua:pushnil(L);
 push_arg(L, Arg) when is_boolean(Arg) -> lua:pushboolean(L, Arg);
+push_arg(L, Arg) when is_atom(Arg)    -> lua:pushlstring(L, a2b(Arg));
 push_arg(L, Arg) when is_binary(Arg)  -> lua:pushlstring(L, Arg);
 push_arg(L, Arg) when is_number(Arg)  -> lua:pushnumber(L, Arg);
 push_arg(L, Args) when is_tuple(Args) ->
@@ -136,3 +137,7 @@ fold( Fun, Acc, L,   N, _) ->
 multicall(L, N) ->
     lua_common:command(L, {?ERL_LUAM_MULTICALL, N}),
     lua_common:receive_valued_response().
+
+-spec a2b(atom()) -> binary().
+a2b(Atom) ->
+    list_to_binary(atom_to_list(Atom)).

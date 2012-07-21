@@ -79,7 +79,10 @@ multicall_2(L) ->
 
 luam_call_test_() ->
     [
-        {"[nil] -> {nil}", ?_assertEqual({nil}, luam_call([nil]))},
+        {"[nil] -> {nil}", ?_assertEqual({'nil'}, luam_call(['nil']))},
+        {"[x] -> {<<\"x\">>}", ?_assertEqual({<<"x">>}, luam_call(['x']))},
+        {"[x, y] -> {<<\"x\">>, <<\"y\">>}", ?_assertEqual(
+                {<<"x">>, <<"y">>}, luam_call(['x', 'y']))},
         {"[1] -> {1}", ?_assertEqual({nil}, luam_call([nil]))},
         {"[4, <<\"bac\">>] -> {4, <<\"bac\">>}", ?_assertEqual(
                 {4, <<"bac">>}, luam_call([4, <<"bac">>]))},
@@ -89,7 +92,9 @@ luam_call_test_() ->
         {"[1, 2] -> {1, 2}", ?_assertEqual({1, 2}, luam_call([1, 2]))},
         {"[1, []] -> {1, []}", ?_assertEqual({1, []}, luam_call([1, []]))},
         {"[true, false, true] -> {true, false, true}", ?_assertEqual(
-                {true, false, true}, luam_call([true, false, true]))}
+                {true, false, true}, luam_call([true, false, true]))},
+        {"[5, [{'x', 'y'}]] -> {5, [{<<\"x\">>, <<\"y\">>}]}", ?_assertEqual(
+                {5, [{<<"x">>, <<"y">>}]}, luam_call([5, [{'x', 'y'}]]))}
     ].
 
 %number_test() -> sah([1], {1}).
