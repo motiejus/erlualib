@@ -11,7 +11,7 @@ clean:
 
 test: REBAR_ARGS = -C rebar_test.config
 test: compile
-	$(REBAR) rebar_test.config eunit -v skip_deps=true
+	$(REBAR) eunit -v skip_deps=true
 
 rebar:
 	erl -noshell -s inets start -s ssl start \
