@@ -3,28 +3,37 @@
 -include("proper_utils.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
+-define(T, [{numtests, 3000}]).
+
 oh_prop_test_() ->
     [
-        {timeout, 3600, {"PropEr boolean",
-                ?prop_check(fun boolean_p/0, [])}},
-        {timeout, 3600, {"PropEr 32-bit signed integer",
-                ?prop_check(fun integer_p/0, [{numtests, 3000}])}},
-        {timeout, 3600, {"PropEr random float",
-                ?prop_check(fun float_p/0, [{numtests, 3000}])}}
+        {timeout, 3600, {"boolean", ?prop_check(fun boolean_p/0, [])}},
+        {timeout, 3600, {"lstring", ?prop_check(fun lstring_p/0, ?T)}},
+        {timeout, 3600, {"concat",  ?prop_check(fun concat_p/0,  ?T)}},
+        {timeout, 3600, {"float",   ?prop_check(fun float_p/0,   ?T)}},
+        {timeout, 3600, {"int32",   ?prop_check(fun int_p/0,     ?T)}}
     ].
 
-boolean_p() ->
-    ?FORALL(X, boolean(),
-        push_prop_helper(X, pushboolean, toboolean)).
+boolean_p() -> ?FORALL(X, boolean(), push_hlp(X, pushboolean, toboolean)).
+lstring_p() -> ?FORALL(X, binary(),  push_hlp(X, pushlstring, tolstring)).
+float_p()   -> ?FORALL(X, float(),   push_hlp(X, pushnumber,  tonumber)).
 
-integer_p() ->
+int_p() ->
     ?FORALL(X, integer(-16#7fffffff, 16#7fffffff - 1),
-        push_prop_helper(X, pushinteger, tointeger)
+        push_hlp(X, pushinteger, tointeger)
     ).
 
-float_p() ->
-    ?FORALL(X, float(),
-        push_prop_helper(X, pushnumber, tonumber)).
+concat_p() ->
+    ?FORALL(X, list(binary()),
+        begin
+                {ok, L} = lua:new_state(),
+                [lua:pushlstring(L, B) || B <- X],
+                Concated = iolist_to_binary(X),
+                ok = lua:concat(L, length(X)),
+                R = Concated =:= lua:tolstring(L, -1),
+                lua:close(L),
+                R
+        end).
 
 small_integer_test() -> push_to_helper(1, pushinteger, tointeger).
 zero_integer_test() -> push_to_helper(0, pushinteger, tointeger).
@@ -144,7 +153,7 @@ next(L) ->
 %% Helpers
 %% =============================================================================
 
-push_prop_helper(Val, Push, To) ->
+push_hlp(Val, Push, To) ->
     try
         push_to_helper(Val, Push, To),
         true
