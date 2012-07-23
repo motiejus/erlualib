@@ -125,8 +125,8 @@ fold(Fun, Acc0, L, N) ->
 
 fold(_Fun, Acc, _L, _N, 0) -> Acc;
 fold( Fun, Acc, L,   N, _) ->
-    V = toterm(L, -1), lua:remove(L, -1),
-    K = toterm(L, -1),
+    V = toterm(L, lua:gettop(L)), lua:remove(L, -1),
+    K = toterm(L, lua:gettop(L)),
     Acc2 = Fun(K, V, Acc),
     fold(Fun, Acc2, L, N, lua:next(L, N)).
 
