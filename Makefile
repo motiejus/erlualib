@@ -1,5 +1,5 @@
-REBAR=./rebar
-REBAR_URL=http://cloud.github.com/downloads/basho/rebar/rebar
+REBAR = ./rebar $(REBAR_ARGS)
+REBAR_URL = http://cloud.github.com/downloads/basho/rebar/rebar
 
 .PHONY: clean compile test
 
@@ -9,9 +9,9 @@ compile: rebar
 clean:
 	$(REBAR) clean
 
-test:
-	$(REBAR) -C rebar_test.config get-deps compile
-	$(REBAR) -C rebar_test.config eunit -v skip_deps=true
+test: REBAR_ARGS = -C rebar_test.config
+test: compile
+	$(REBAR) rebar_test.config eunit -v skip_deps=true
 
 rebar:
 	erl -noshell -s inets start -s ssl start \
