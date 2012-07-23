@@ -36,10 +36,23 @@
 -type abs_index() :: pos_integer().
 -type rel_index() :: neg_integer().
 
+-export_type([lua/0, index/0, abs_index/0]).
+
 -type lua_type() :: nil | boolean | light_user_data | number |
         string | table | function | user_data | thread | unknown.
 
--export_type([lua/0, index/0, abs_index/0]).
+-type arg() :: binary()               | % string
+               atom()                 | % string
+               number()               | % number
+               list({arg(), arg()})   | % associative table
+               tuple(arg()).            % indexed table
+-type ret() :: nil       |
+               boolean() |
+               float()   |
+               binary()  |
+               list({ret(), ret()}).
+-export_type([arg/0, ret/0]).
+
 
 -type lua_name() :: string().
 

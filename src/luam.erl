@@ -42,35 +42,22 @@
 -module(luam).
 
 -include("lua_api.hrl").
--include_lib("eunit/include/eunit.hrl").
+-include("lua_types.hrl").
 
 -export([call/3, multicall/2, push_arg/2]).
 -export([fold/4]).
 
 
--type arg() :: binary() | % string
-               atom()   | % string
-               number() | % number
-               list()   | % table
-               tuple().   % table
-
--type ret() :: nil       |
-               boolean() |
-               float()   |
-               binary()  |
-               list({ret(), ret()}).
-
 %% @doc Call FunName with Args. Return all arguments in tuple.
--spec call(lua:lua(), string(), list(arg())) -> tuple(ret()).
+-spec call(lua:lua(), string(), list(lua:arg())) -> tuple(lua:ret()).
 call(L, FunName, Args) ->
     lua:getglobal(L, FunName),
     [push_arg(L, Arg) || Arg <- Args],
     N = multicall(L, length(Args)),
-    error_logger:format("Yoda: ~p~n", [lua:gettop(L)]), timer:sleep(100),
     pop_results(L, N).
 
 %% @doc Push arbitrary variable on stack
--spec push_arg(lua:lua(), arg()) -> ok.
+-spec push_arg(lua:lua(), lua:arg()) -> ok.
 push_arg(L, nil)                      -> lua:pushnil(L);
 push_arg(L, Arg) when is_boolean(Arg) -> lua:pushboolean(L, Arg);
 push_arg(L, Arg) when is_atom(Arg)    -> lua:pushlstring(L, a2b(Arg));
@@ -100,9 +87,9 @@ pop_results(L, N) ->
     list_to_tuple(lists:reverse(lists:map(MapFun, lists:seq(1, N)))).
 
 %% @doc Returns Nth element on the stack. [-0, +0]
--spec toterm(lua:lua(), lua:index()) -> ret().
+-spec toterm(lua:lua(), lua:index()) -> lua:ret().
 toterm(L, N) ->
-    case ?debugVal(lua:type(L, N)) of
+    case lua:type(L, N) of
         nil -> nil;
         boolean -> lua:toboolean(L, N);
         number -> lua:tonumber(L, N);
@@ -114,7 +101,7 @@ toterm(L, N) ->
 
 %% @doc Call Fun over table on absolute index N. [-0, +0].
 -spec fold(Fun, Acc0, lua:lua(), N :: lua:abs_index()) -> Acc1 when
-      Fun :: fun((ret(), ret(), AccIn) -> AccOut),
+      Fun :: fun((lua:ret(), lua:ret(), AccIn) -> AccOut),
       Acc0 :: term(),
       Acc1 :: term(),
       AccIn :: term(),

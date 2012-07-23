@@ -1,7 +1,6 @@
 -module(lua_test).
 
 -include("proper_utils.hrl").
--include_lib("eunit/include/eunit.hrl").
 
 -define(T, [{numtests, 3000}]).
 

@@ -1,17 +1,21 @@
 -module(luam_test).
 
+%-define(PROPER_MODULE_TESTS, 1).
+%-include("proper_utils.hrl").
+-include_lib("proper/include/proper.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
 ns() -> {ok, L} = lua:new_state(), L.
 oh_test_() ->
     [
-        %{"fold", ?_test(fold(ns()))},
-        %{"push arg empty table", ?_test(push_arg_empty_table(ns()))},
-        %{"push arg table 1", ?_test(push_arg_table1(ns()))},
-        %{"push arg nested table", ?_test(push_arg_nested_table(ns()))},
-        %{"multicall 0", ?_test(multicall_0(ns()))},
-        %{"multicall 1", ?_test(multicall_1(ns()))},
-        %{"multicall 2", ?_test(multicall_2(ns()))}
+        {"fold", ?_test(fold(ns()))},
+        {"fold nested", ?_test(fold_nested(ns()))},
+        {"push arg empty table", ?_test(push_arg_empty_table(ns()))},
+        {"push arg table 1", ?_test(push_arg_table1(ns()))},
+        {"push arg nested table", ?_test(push_arg_nested_table(ns()))},
+        {"multicall 0", ?_test(multicall_0(ns()))},
+        {"multicall 1", ?_test(multicall_1(ns()))},
+        {"multicall 2", ?_test(multicall_2(ns()))}
     ].
 
 fold(L) ->
@@ -26,6 +30,22 @@ fold(L) ->
     R = luam:fold(fun(K, V, Acc) -> [{K, V}|Acc] end, [], L, 1),
     ?assertEqual(
         lists:sort([{<<"vienas">>, <<"1">>}, {<<"du">>, <<"2">>}]),
+        lists:sort(R)
+    ),
+    ?assertEqual(1, lua:gettop(L)).
+
+fold_nested(L) ->
+    lua:createtable(L, 0, 2),
+    lua:pushlstring(L, <<"k">>),
+    lua:createtable(L, 0, 2),
+    lua:pushlstring(L, <<"vienas">>),
+    lua:pushlstring(L, <<"1">>),
+    lua:settable(L, 3),
+    lua:settable(L, 1),
+    ?assertEqual(1, lua:gettop(L)),
+    R = luam:fold(fun(K, V, Acc) -> [{K, V}|Acc] end, [], L, 1),
+    ?assertEqual(
+        lists:sort([{<<"k">>, [{<<"vienas">>, <<"1">>}]}]),
         lists:sort(R)
     ),
     ?assertEqual(1, lua:gettop(L)).
@@ -79,53 +99,25 @@ multicall_2(L) ->
 
 luam_call_test_() ->
     [
-        %{"single nil", ?_assertEqual({'nil'}, luam_call(['nil']))},
-        %{"single atom", ?_assertEqual({<<"x">>}, luam_call(['x']))},
-        %{"1 number", ?_assertEqual({nil}, luam_call([nil]))},
-        %{"number and string", ?_assertEqual(
-        %        {4, <<"bac">>}, luam_call([4, <<"bac">>]))},
-        %{"numeric proplist", ?_assertEqual(
-        %        {[{1, 4}]}, luam_call([[{1, 4}]]))
-        %},
-        %{"string proplist", ?_assertEqual(
-        %        {[{<<"x">>, <<"y">>}]}, luam_call([[{'x', 'y'}]]))},
-        %{"2 numeric arguments", ?_assertEqual({1, 2}, luam_call([1, 2]))},
-        %{"number and empty table", ?_assertEqual({1, []}, luam_call([1, []]))},
-        %{"3 booleans and number", ?_assertEqual(
-        %        {true, false, true, 4}, luam_call([true, false, true, 4]))},
-        %{"number and table", ?_assertEqual(
-        %        {5, [{<<"x">>, <<"y">>}]}, luam_call([5, [{'x', 'y'}]]))},
-        {"table with table keys", fun table_with_table_keys/0}
+        {"single nil", ?_assertEqual({'nil'}, luam_call(['nil']))},
+        {"single atom", ?_assertEqual({<<"x">>}, luam_call(['x']))},
+        {"1 number", ?_assertEqual({nil}, luam_call([nil]))},
+        {"number and string", ?_assertEqual(
+                {4, <<"bac">>}, luam_call([4, <<"bac">>]))},
+        {"numeric proplist", ?_assertEqual(
+                {[{1, 4}]}, luam_call([[{1, 4}]]))
+        },
+        {"string proplist", ?_assertEqual(
+                {[{<<"x">>, <<"y">>}]}, luam_call([[{'x', 'y'}]]))},
+        {"2 numeric arguments", ?_assertEqual({1, 2}, luam_call([1, 2]))},
+        {"number and empty table", ?_assertEqual({1, []}, luam_call([1, []]))},
+        {"3 booleans and number", ?_assertEqual(
+                {true, false, true, 4}, luam_call([true, false, true, 4]))},
+        {"number and table", ?_assertEqual(
+                {5, [{<<"x">>, <<"y">>}]}, luam_call([5, [{'x', 'y'}]]))},
+        {"2 empty tables", ?assertEqual(
+                {[{<<>>,<<>>},{<<>>,<<>>}]}, luam_call([[{'',''},{'',''}]]))}
     ].
-
-table_with_table_keys() ->
-    Table =
-    [ % table starts
-        { % first pair
-            <<"aha">>, % key
-            [{'labas', 'rytas'}] % value
-        } % /first pair
-    ], % /table
-    ?assertEqual({Table}, luam_call([Table])).
-
-%number_test() -> sah([1], {1}).
-%nil_test() -> sah([nil], {nil}).
-%proplist1_test() -> sah([{1, 1}]).
-%proplist2_test() -> sah([{1,1}, {2, 2}]).
-%proplist3a_test() -> sah([{1,1},{2,<<"x">>}]).
-%proplist3b_test() -> sah([{1,1},{2,'x'}], [{1,1},{2,<<"x">>}]).
-%
-%tuple1_test() -> sah({1}, [{1, 1}]).
-%tuple2_test() -> sah({1,2}, [{1,1}, {1,2}]).
-%tuple3a_test() -> sah({1,<<"x">>}, [{1,1},{2,<<"x">>}]).
-%tuple3b_test() -> sah({1,'x'}, [{1,1},{2,<<"x">>}]).
-
-%number_test() -> sah(9).
-%float_test() -> sah(9.21).
-%neg_float_test() -> sah(-9.21).
-%binary_test() -> sah(<<"hiho">>).
-%atom_test() -> sah(hiho, <<"hiho">>).
-%
 
 luam_call(Args) ->
     {ok, L} = lua:new_state(),
@@ -133,3 +125,41 @@ luam_call(Args) ->
     R = luam:call(L, "t", Args),
     lua:close(L),
     R.
+
+-type arg() :: binary()               | % string
+               atom()                 | % string
+               number()               | % number
+               list({arg(), arg()})   | % associative table
+               tuple(arg()).            % indexed table
+
+prop_luam_call() ->
+    ?FORALL(A, list(arg()),
+        begin
+                Call = luam_call(A),
+                Conv = list_to_tuple(lists:map(fun arg_to_ret/1, A)),
+                io:format("Call: ~p, Conv: ~p~n", [Call, Conv]),
+                Call =:= Conv
+        end).
+
+proper_test_() ->
+    {timeout, 3600, fun() ->
+                proper_utils:run_proper(module,
+                    fun() ->
+%                            ?assertEqual([], proper:module(?MODULE,
+%                                    [{max_size, 8}]))
+ok
+                    end)
+        end
+    }.
+
+arg_to_ret(A) when A =:= nil; is_boolean(A); is_number(A); is_binary(A) ->
+    A;
+
+arg_to_ret(A) when is_atom(A) ->
+    list_to_binary(atom_to_list(A));
+
+arg_to_ret(A) when is_tuple(A) ->
+    arg_to_ret(lists:zip(lists:seq(1, size(A)), tuple_to_list(A)));
+
+arg_to_ret(A) when is_list(A) ->
+    [{arg_to_ret(K), arg_to_ret(V)} || {K, V} <- A].
