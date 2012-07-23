@@ -1,6 +1,30 @@
 -module(lua_test).
 
+-include("proper_utils.hrl").
 -include_lib("eunit/include/eunit.hrl").
+
+oh_prop_test_() ->
+    [
+        {timeout, 3600, {"PropEr boolean",
+                ?prop_check(fun boolean_p/0, [])}},
+        {timeout, 3600, {"PropEr 32-bit signed integer",
+                ?prop_check(fun integer_p/0, [{numtests, 3000}])}},
+        {timeout, 3600, {"PropEr random float",
+                ?prop_check(fun float_p/0, [{numtests, 3000}])}}
+    ].
+
+boolean_p() ->
+    ?FORALL(X, boolean(),
+        push_prop_helper(X, pushboolean, toboolean)).
+
+integer_p() ->
+    ?FORALL(X, integer(-16#7fffffff, 16#7fffffff - 1),
+        push_prop_helper(X, pushinteger, tointeger)
+    ).
+
+float_p() ->
+    ?FORALL(X, float(),
+        push_prop_helper(X, pushnumber, tonumber)).
 
 small_integer_test() -> push_to_helper(1, pushinteger, tointeger).
 zero_integer_test() -> push_to_helper(0, pushinteger, tointeger).
@@ -119,6 +143,14 @@ next(L) ->
 %% =============================================================================
 %% Helpers
 %% =============================================================================
+
+push_prop_helper(Val, Push, To) ->
+    try
+        push_to_helper(Val, Push, To),
+        true
+    catch
+        error:_ -> false
+    end.
 
 push_to_helper(Val, Push, To) ->
     {ok, L} = lua:new_state(),
