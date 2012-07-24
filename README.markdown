@@ -1,21 +1,35 @@
 Erl-Lua is a library for embedding Lua into Erlang. It provides a simple
-interface that is very similar to the Lua C API. In the future it will also
-include a higher level API to simplify things further.
+interface that is very similar to the Lua C API.
 
 This is a fork of Ray Morgan's [Erl-Lua] library with:
 
 * Rebar
-* Much better test coverage (all API except for boilerplate is covered)
+* *Much* better test coverage (all API except for boilerplate is covered)
 * Dialyzer is happy about this project
-* Some Bugfixes
-* Some new commands (lua_newtable, lua_pushlstring)
+* Bugfixes
+* New low-level commands
 * Strings in Lua are Binaries in Erlang (instead of lists of numbers)
 
-Some major features are planned:
-* Extend lua_erl:call/4 to handle recursive arguments and PropErly test it
+Major new feature:
+* luam:call/4.
+
+This is planned:
 * [Erlang behaviours in Lua]
 
-Example:
+Example how to use luam:call/4:
+
+    1> {ok, L} = lua:new_state(),
+    2> ok = lual:dostring(L, <<"function t(when, tab) return tab[when] end">>),
+    3> Args = [noon, [{ morning, breakfast }, { noon, lunch }, {evening, dinner} ] ],
+    4> luam:call(L, "t", Args),
+    {<<"lunch">>}.
+
+Gist: you can pass (almost) arbitrary Erlang values to the Lua call, and get
+(almost) arbitrary values back, deserialized.
+
+This will be especially powerful combined with with [Erlang behaviours in Lua]. As said, stay tuned.
+
+Older examples:
 
     {ok, L} = lua:new_state().
     lua:getfield(L, global, "print").
@@ -38,22 +52,13 @@ There is also a simple way to run one off simple Lua code snippets:
     lual:dostring(L, <<"print 'Howdy!'">>).
     % (Lua) => Howdy!
     
-**NEW Higher Level API**
+Testing
+=======
 
-*call* (lua\_state L, (atom|string) function\_name, list arguments, [int num\_returned]) - Call a Lua function and return the values.
+Code has 100% non-boilerplate test coverage, some of which are PropErly tested.
+To test the whole project, run:
 
-    1> {ok, L} = lua:new_state().
-    2> lua_erl:call(L, type, [23], 1).
-    {"number"}
-    3> lual:dostring(L, <<"function add(a, b, c) return a + b + c end">>).
-    4> lua_erl:call(L, add, [2, 3, 4], 1).
-    {9}
-
-The strange 4th arg is the number of values the function can return (since in Lua you can return multiple things).
-If the number of returned values is 1, the argument can be left off.. therefore both of the above could be rewritten:
-
-    lua_erl:call(L, type, [23]).
-    lua_erl:call(L, add, [2, 3, 4]).
+    make test
 
 [Erl-Lua]: https://github.com/raycmorgan/erl-lua/
 [Erlang behaviours in Lua]: http://m.jakstys.lt/tech/2012/06/erlang-behaviours-in-lua/
