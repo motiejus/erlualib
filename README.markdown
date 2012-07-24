@@ -11,9 +11,9 @@ This is a fork of Ray Morgan's [Erl-Lua] library with:
 * Strings in Lua are Binaries in Erlang (instead of lists of numbers)
 
 Major new feature:
-* luam:call/4.
+* `luam:call/4`.
 
-This is planned:
+This is in progress:
 * [Erlang behaviours in Lua]
 
 Example how to use luam:call/4:
@@ -25,11 +25,11 @@ Example how to use luam:call/4:
     {<<"lunch">>}.
 
 Gist: you can pass (almost) arbitrary Erlang values to the Lua call, and get
-(almost) arbitrary values back, deserialized.
+(almost) arbitrary values back, deserialized, after the call. This will be
+especially powerful combined with with [Erlang behaviours in Lua]. As said,
+stay tuned.
 
-This will be especially powerful combined with with [Erlang behaviours in Lua]. As said, stay tuned.
-
-Older examples:
+Low level command example:
 
     {ok, L} = lua:new_state().
     lua:getfield(L, global, "print").
@@ -55,7 +55,7 @@ There is also a simple way to run one off simple Lua code snippets:
 Testing
 =======
 
-Code has 100% non-boilerplate test coverage, some of which are PropErly tested.
+Code has 100% non-boilerplate test coverage, some of which is PropErly tested.
 To test the whole project, run:
 
     make test
