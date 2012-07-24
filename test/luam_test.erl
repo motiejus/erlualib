@@ -114,9 +114,7 @@ luam_call_test_() ->
         {"3 booleans and number", ?_assertEqual(
                 {true, false, true, 4}, luam_call([true, false, true, 4]))},
         {"number and table", ?_assertEqual(
-                {5, [{<<"x">>, <<"y">>}]}, luam_call([5, [{'x', 'y'}]]))},
-        {"2 empty tables", ?assertEqual(
-                {[{<<>>,<<>>},{<<>>,<<>>}]}, luam_call([[{'',''},{'',''}]]))}
+                {5, [{<<"x">>, <<"y">>}]}, luam_call([5, [{'x', 'y'}]]))}
     ].
 
 luam_call(Args) ->
