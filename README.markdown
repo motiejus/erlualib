@@ -1,22 +1,21 @@
 Erl-Lua is a library for embedding Lua into Erlang. It provides a simple
-interface that is very similar to the Lua C API.
+interface that is very similar to the Lua C API, as well as some very useful
+high-level functions.
 
-This is a fork of Ray Morgan's [Erl-Lua] library with:
+This is a fork of Ray Morgan's [Erl-Lua] library with the following changes:
 
-* Rebar
-* *Much* better test coverage (all API except for boilerplate is covered)
-* Dialyzer is happy about this project
-* Bugfixes
-* New low-level commands
+* High test coverage
+* Some new low-level commands
 * Strings in Lua are Binaries in Erlang (instead of lists of numbers)
+* Many bugfixes
+* Dialyzer is happy about this project
+* Rebar
+* Major new feature: `luam:call/4`.
 
-Major new feature:
-* `luam:call/4`.
-
-This is in progress:
+The following is in progress:
 * [Erlang behaviours in Lua]
 
-Example how to use luam:call/4:
+Example how to use `luam:call/4`:
 
     1> {ok, L} = lua:new_state(),
     2> ok = lual:dostring(L, <<"function t(when, tab) return tab[when] end">>),
@@ -29,7 +28,7 @@ Gist: you can pass (almost) arbitrary Erlang values to the Lua call, and get
 especially powerful combined with with [Erlang behaviours in Lua]. As said,
 stay tuned.
 
-Low level command example:
+Low level API example:
 
     {ok, L} = lua:new_state().
     lua:getfield(L, global, "print").
@@ -55,8 +54,8 @@ There is also a simple way to run one off simple Lua code snippets:
 Testing
 =======
 
-Code has 100% non-boilerplate test coverage, some of which is PropErly tested.
-To test the whole project, run:
+Code has 100% non-boilerplate test coverage, some of which is PropErly covered.
+To test the whole project and see eUnit and PropEr in action, run:
 
     make test
 
