@@ -42,8 +42,6 @@
 -module(luam).
 
 -include("lua_api.hrl").
--include("lua_types.hrl").
--include_lib("eunit/include/eunit.hrl").
 
 -export([call/3, multicall/2, push_arg/2]).
 -export([fold/4]).
