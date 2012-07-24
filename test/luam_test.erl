@@ -140,7 +140,7 @@ valid_arg(Ret) when is_list(Ret) ->
     (length(NormalizeKeys) =:= length(proplists:get_keys(NormalizeKeys))) andalso
     lists:all(fun({K, V}) -> valid_arg(K) and valid_arg(V) end, NormalizeKeys);
 
-valid_arg(Ret) ->
+valid_arg(_Ret) ->
     true.
 
 %% @doc Sort inner proplists for comparison
