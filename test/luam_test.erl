@@ -132,22 +132,44 @@ luam_call(Args) ->
                list({arg(), arg()})   | % associative table
                tuple(arg()).            % indexed table
 
+%% @doc Disallow proplists with non-unique keys
+valid(Args) when is_list(Args) ->
+    % Check if every argument is valid
+    lists:all(fun(Arg) -> valid_arg(arg_to_ret(Arg)) end, Args).
+
+valid_arg(Ret) when is_list(Ret) ->
+    NormalizeKeys = lists:map(fun({K, V}) -> {remove_0s(K), V} end, Ret),
+    (length(NormalizeKeys) =:= length(proplists:get_keys(NormalizeKeys))) andalso
+    lists:all(fun({K, V}) -> valid_arg(K) and valid_arg(V) end, NormalizeKeys);
+
+valid_arg(Ret) ->
+    true.
+
+%% @doc Sort inner proplists for comparison
+sorted(List) when is_list(List) ->
+    Inner = lists:map(fun({K, V}) -> {sorted(K), sorted(V)} end, List),
+    lists:keysort(1, Inner);
+
+sorted(X) ->
+    X.
+
 prop_luam_call() ->
-    ?FORALL(A, list(arg()),
+    ?FORALL(Args,
+        ?SUCHTHAT(Args, list(arg()), valid(Args)
+        ),
         begin
-                Call = luam_call(A),
-                Conv = list_to_tuple(lists:map(fun arg_to_ret/1, A)),
-                io:format("Call: ~p, Conv: ~p~n", [Call, Conv]),
-                Call =:= Conv
+                Ret = tuple_to_list(luam_call(Args)),
+                Conv = lists:map(fun arg_to_ret/1, Args),
+                %io:format("Arg: ~p, Ret: ~p, Conv: ~p~n", [Args, Ret, Conv]),
+                lists:map(fun sorted/1, Ret) =:= lists:map(fun sorted/1, Conv)
         end).
 
 proper_test_() ->
     {timeout, 3600, fun() ->
                 proper_utils:run_proper(module,
                     fun() ->
-%                            ?assertEqual([], proper:module(?MODULE,
-%                                    [{max_size, 8}]))
-ok
+                            ?assertEqual([], proper:module(?MODULE,
+                                    [{max_size, 8}, {numtests, 3000}]))
                     end)
         end
     }.
@@ -163,3 +185,13 @@ arg_to_ret(A) when is_tuple(A) ->
 
 arg_to_ret(A) when is_list(A) ->
     [{arg_to_ret(K), arg_to_ret(V)} || {K, V} <- A].
+
+%% @doc Remove trailing zeroes from binary
+remove_0s(Binary) when is_binary(Binary) ->
+    F = fun(0) -> true; (_) -> false end,
+    RevArr = lists:reverse(binary_to_list(Binary)),
+    RetArr = lists:reverse(lists:dropwhile(F, RevArr)),
+    list_to_binary(RetArr);
+
+remove_0s(L) ->
+    L.
