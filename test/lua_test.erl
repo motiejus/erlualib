@@ -2,7 +2,7 @@
 
 -include("proper_utils.hrl").
 
--define(T, [{numtests, 3000}]).
+-define(T, [{numtests, 1000}]).
 
 oh_prop_test_() ->
     [

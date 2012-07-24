@@ -167,7 +167,7 @@ proper_test_() ->
                 proper_utils:run_proper(module,
                     fun() ->
                             ?assertEqual([], proper:module(?MODULE,
-                                    [{max_size, 8}, {numtests, 3000}]))
+                                    [{max_size, 8}, {numtests, 1000}]))
                     end)
         end
     }.
