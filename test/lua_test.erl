@@ -13,13 +13,13 @@ oh_prop_test_() ->
         {timeout, 3600, {"int32",   ?prop_check(fun int_p/0,     ?T)}}
     ].
 
-boolean_p() -> ?FORALL(X, boolean(), push_hlp(X, pushboolean, toboolean)).
-lstring_p() -> ?FORALL(X, binary(),  push_hlp(X, pushlstring, tolstring)).
-float_p()   -> ?FORALL(X, float(),   push_hlp(X, pushnumber,  tonumber)).
+boolean_p() -> ?FORALL(X, boolean(), push_to_helper(X, pushboolean, toboolean)).
+lstring_p() -> ?FORALL(X, binary(),  push_to_helper(X, pushlstring, tolstring)).
+float_p()   -> ?FORALL(X, float(),   push_to_helper(X, pushnumber,   tonumber)).
 
 int_p() ->
     ?FORALL(X, integer(-16#7fffffff, 16#7fffffff - 1),
-        push_hlp(X, pushinteger, tointeger)
+        push_to_helper(X, pushinteger, tointeger)
     ).
 
 concat_p() ->
@@ -152,14 +152,6 @@ next(L) ->
 %% Helpers
 %% =============================================================================
 
-push_hlp(Val, Push, To) ->
-    try
-        push_to_helper(Val, Push, To),
-        true
-    catch
-        error:_ -> false
-    end.
-
 push_to_helper(Val, Push, To) ->
     {ok, L} = lua:new_state(),
     ?assertEqual(ok, lua:Push(L, Val)),
@@ -167,7 +159,8 @@ push_to_helper(Val, Push, To) ->
     % Test luam:push_arg/2
     ?assertEqual(ok, luam:push_arg(L, Val)),
     ?assertEqual(Val, lua:To(L, 2)),
-    lua:close(L).
+    lua:close(L),
+    true.
 
 type_test_helper(PushFun, Type) ->
     {ok, L} = lua:new_state(),
