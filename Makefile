@@ -1,5 +1,5 @@
 REBAR = ./rebar $(REBAR_ARGS)
-REBAR_URL = http://cloud.github.com/downloads/basho/rebar/rebar
+REBAR_URL = http://cloud.github.com/downloads/Motiejus/rebar/rebar
 
 .PHONY: clean compile test
 
