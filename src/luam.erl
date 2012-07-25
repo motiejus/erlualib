@@ -43,7 +43,7 @@
 
 -include("lua_api.hrl").
 
--export([call/3, multicall/2, is_atom/2, pushterm/2]).
+-export([call/3, multicall/2, maybe_atom/2, pushterm/2]).
 -export([fold/4]).
 
 
@@ -130,9 +130,11 @@ multicall(L, N) ->
     lua_common:receive_valued_response().
 
 -spec a2b(atom()) -> binary().
-a2b(Atom) ->
+a2b(Atom) when is_atom(Atom) ->
     list_to_binary(atom_to_list(Atom)).
 
-is_atom(L, N) ->
-    lua_common:command(L, {?ERL_LUAM_IS_ATOM, N}),
+%% @doc Return atom() if value on N is atom; false otherwise
+-spec maybe_atom(lua:lua(), lua:index()) -> {ok, atom()} | false.
+maybe_atom(L, N) ->
+    lua_common:command(L, {?ERL_LUAM_MAYBE_ATOM, N}),
     lua_common:receive_valued_response().

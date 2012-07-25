@@ -42,7 +42,7 @@ extern "C" {
   void erl_lual_dostring (lua_drv_t *driver_data, char *buf, int index);
 
   void erl_luam_multicall (lua_drv_t *driver_data, char *buf, int index);
-  void erl_luam_is_atom (lua_drv_t *driver_data, char *buf, int index);
+  void erl_luam_maybe_atom (lua_drv_t *driver_data, char *buf, int index);
   
   void erl_lua_no_command (lua_drv_t *driver_data);
 

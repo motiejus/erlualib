@@ -161,8 +161,8 @@ process(ErlDrvData handle, ErlIOVec *ev)
   case ERL_LUAM_MULTICALL:
     erl_luam_multicall(driver_data, buf, index);
     break;
-  case ERL_LUAM_IS_ATOM:
-    erl_luam_is_atom(driver_data, buf, index);
+  case ERL_LUAM_MAYBE_ATOM:
+    erl_luam_maybe_atom(driver_data, buf, index);
     break;
   
   default:

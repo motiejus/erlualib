@@ -419,19 +419,33 @@ erl_luam_multicall(lua_drv_t *driver_data, char *buf, int index)
 }
 
 void
-erl_luam_is_atom(lua_drv_t *driver_data, char *buf, int index)
+erl_luam_maybe_atom(lua_drv_t *driver_data, char *buf, int index)
 {
   long i;
-  int ret;
+  int is_atom;
+  char *atom;
   ei_decode_long(buf, &index, &i);
-  ret = luam_testudata(driver_data->L, i, "erlang.t_atom") != NULL;
 
-  ErlDrvTermData spec[] = {
-        ERL_DRV_ATOM,   ATOM_OK,
-        ERL_DRV_ATOM, driver_mk_atom(ret ? "true" : "false"),
-        ERL_DRV_TUPLE,  2
-  };
-  driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
+  is_atom = luam_testudata(driver_data->L, i, "erlang.t_atom") != NULL;
+
+  if (is_atom) {
+      atom = (char*)lua_touserdata(driver_data->L, i);
+      ErlDrvTermData spec[] = {
+          ERL_DRV_ATOM, ATOM_OK,
+            ERL_DRV_ATOM, ATOM_OK,
+            ERL_DRV_ATOM, driver_mk_atom(atom),
+            ERL_DRV_TUPLE,  2,
+          ERL_DRV_TUPLE, 2
+      };
+      driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
+  } else {
+      ErlDrvTermData spec[] = {
+          ERL_DRV_ATOM, ATOM_OK,
+          ERL_DRV_ATOM, driver_mk_atom("false"),
+          ERL_DRV_TUPLE, 2
+      };
+      driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
+  }
 }
 
 void
