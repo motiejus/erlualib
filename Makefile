@@ -9,7 +9,7 @@ compile: rebar
 clean:
 	$(REBAR) clean
 
-#test: REBAR_ARGS = -C rebar_test.config
+test: REBAR_ARGS = -C rebar_test.config
 test: compile
 	$(REBAR) eunit -v skip_deps=true
 
