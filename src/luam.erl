@@ -57,7 +57,7 @@ call(L, FunName, Args) ->
     pop_results(L, N).
 
 %% @doc Push arbitrary variable on stack
--spec pushterm(lua:lua(), lua:arg()) -> ok.
+-spec pushterm(lua:lua(), lua:arg())  -> ok.
 pushterm(L, nil)                      -> lua:pushnil(L);
 pushterm(L, Arg) when is_boolean(Arg) -> lua:pushboolean(L, Arg);
 pushterm(L, Arg) when is_atom(Arg)    -> lua:pushlstring(L, a2b(Arg));
