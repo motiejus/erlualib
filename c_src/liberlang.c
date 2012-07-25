@@ -17,8 +17,8 @@ static int e_atom(lua_State *L) {
     luaL_checkstring(L, 1);
     str = lua_tolstring(L, 1, &len);
 
-    userdata = (char*)lua_newuserdata(L, len);
-    memcpy(userdata, str, len);
+    userdata = (char*)lua_newuserdata(L, len+1);
+    memcpy(userdata, str, len+1);
     luaL_getmetatable(L, "erlang.t_atom");
     lua_setmetatable(L, -2);
     return 1;
