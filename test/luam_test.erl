@@ -99,16 +99,16 @@ multicall_2(L) ->
 
 luam_call_test_() ->
     [
-        {"single nil", ?_assertEqual({'nil'}, luam_call(['nil']))},
-        {"single atom", ?_assertEqual({<<"x">>}, luam_call(['x']))},
-        {"1 number", ?_assertEqual({nil}, luam_call([nil]))},
+        {"single nil", ?_assertEqual(nil, luam_call(['nil']))},
+        {"single atom", ?_assertEqual(<<"x">>, luam_call(['x']))},
+        {"1 number", ?_assertEqual(nil, luam_call([nil]))},
         {"number and string", ?_assertEqual(
                 {4, <<"bac">>}, luam_call([4, <<"bac">>]))},
         {"numeric proplist", ?_assertEqual(
-                {[{1, 4}]}, luam_call([[{1, 4}]]))
+                [{1, 4}], luam_call([[{1, 4}]]))
         },
         {"string proplist", ?_assertEqual(
-                {[{<<"x">>, <<"y">>}]}, luam_call([[{'x', 'y'}]]))},
+                [{<<"x">>, <<"y">>}], luam_call([[{'x', 'y'}]]))},
         {"2 numeric arguments", ?_assertEqual({1, 2}, luam_call([1, 2]))},
         {"number and empty table", ?_assertEqual({1, []}, luam_call([1, []]))},
         {"3 booleans and number", ?_assertEqual(
@@ -156,7 +156,11 @@ prop_luam_call() ->
         ?SUCHTHAT(Args, list(arg()), valid(Args)
         ),
         begin
-                Ret = tuple_to_list(luam_call(Args)),
+                Ret = case luam_call(Args) of
+                    X when is_tuple(X) -> tuple_to_list(X);
+                    X -> [X]
+                end,
+
                 Conv = lists:map(fun arg_to_ret/1, Args),
                 %io:format("Arg: ~p, Ret: ~p, Conv: ~p~n", [Args, Ret, Conv]),
                 lists:map(fun sorted/1, Ret) =:= lists:map(fun sorted/1, Conv)

@@ -84,7 +84,10 @@ pop_results(L, N) ->
             lua:remove(L, -1),
             R
     end,
-    list_to_tuple(lists:reverse(lists:map(MapFun, lists:seq(1, N)))).
+    case lists:reverse(lists:map(MapFun, lists:seq(1, N))) of
+        [Ret] -> Ret;
+        Ret -> list_to_tuple(Ret)
+    end.
 
 %% @doc Returns Nth element on the stack. [-0, +0]
 -spec toterm(lua:lua(), lua:index()) -> lua:ret().

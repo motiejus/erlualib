@@ -21,7 +21,7 @@ Example how to use `luam:call/4`:
     2> ok = lual:dostring(L, <<"function t(when, tab) return tab[when] end">>),
     3> Args = [noon, [{ morning, breakfast }, { noon, lunch }, {evening, dinner} ] ],
     4> luam:call(L, "t", Args),
-    {<<"lunch">>}.
+    <<"lunch">>.
 
 Gist: you can pass (almost) arbitrary Erlang values to the Lua call, and get
 (almost) arbitrary values back, deserialized, after the call. This will be
