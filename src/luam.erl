@@ -43,7 +43,7 @@
 
 -include("lua_api.hrl").
 
--export([call/3, multicall/2, push_arg/2]).
+-export([call/3, multicall/2, pushterm/2]).
 -export([fold/4]).
 
 
@@ -51,27 +51,27 @@
 -spec call(lua:lua(), string(), list(lua:arg())) -> tuple(lua:ret()).
 call(L, FunName, Args) ->
     lua:getglobal(L, FunName),
-    [push_arg(L, Arg) || Arg <- Args],
+    [pushterm(L, Arg) || Arg <- Args],
     N = multicall(L, length(Args)),
     lua:gettop(L),
     pop_results(L, N).
 
 %% @doc Push arbitrary variable on stack
--spec push_arg(lua:lua(), lua:arg()) -> ok.
-push_arg(L, nil)                      -> lua:pushnil(L);
-push_arg(L, Arg) when is_boolean(Arg) -> lua:pushboolean(L, Arg);
-push_arg(L, Arg) when is_atom(Arg)    -> lua:pushlstring(L, a2b(Arg));
-push_arg(L, Arg) when is_binary(Arg)  -> lua:pushlstring(L, Arg);
-push_arg(L, Arg) when is_number(Arg)  -> lua:pushnumber(L, Arg);
-push_arg(L, Args) when is_tuple(Args) ->
+-spec pushterm(lua:lua(), lua:arg()) -> ok.
+pushterm(L, nil)                      -> lua:pushnil(L);
+pushterm(L, Arg) when is_boolean(Arg) -> lua:pushboolean(L, Arg);
+pushterm(L, Arg) when is_atom(Arg)    -> lua:pushlstring(L, a2b(Arg));
+pushterm(L, Arg) when is_binary(Arg)  -> lua:pushlstring(L, Arg);
+pushterm(L, Arg) when is_number(Arg)  -> lua:pushnumber(L, Arg);
+pushterm(L, Args) when is_tuple(Args) ->
     Proplist = lists:zip(lists:seq(1, size(Args)), tuple_to_list(Args)),
-    push_arg(L, Proplist);
-push_arg(L, Args) when is_list(Args) ->
+    pushterm(L, Proplist);
+pushterm(L, Args) when is_list(Args) ->
     lua:createtable(L, length(Args), 0),
     TPos = lua:gettop(L),
     Fun = fun({K, V}) ->
-            push_arg(L, K),
-            push_arg(L, V),
+            pushterm(L, K),
+            pushterm(L, V),
             lua:settable(L, TPos)
     end,
     lists:foreach(Fun, Args).

@@ -10,9 +10,9 @@ oh_test_() ->
     [
         {"fold", ?_test(fold(ns()))},
         {"fold nested", ?_test(fold_nested(ns()))},
-        {"push arg empty table", ?_test(push_arg_empty_table(ns()))},
-        {"push arg table 1", ?_test(push_arg_table1(ns()))},
-        {"push arg nested table", ?_test(push_arg_nested_table(ns()))},
+        {"push arg empty table", ?_test(pushterm_empty_table(ns()))},
+        {"push arg table 1", ?_test(pushterm_table1(ns()))},
+        {"push arg nested table", ?_test(pushterm_nested_table(ns()))},
         {"multicall 0", ?_test(multicall_0(ns()))},
         {"multicall 1", ?_test(multicall_1(ns()))},
         {"multicall 2", ?_test(multicall_2(ns()))}
@@ -50,13 +50,13 @@ fold_nested(L) ->
     ),
     ?assertEqual(1, lua:gettop(L)).
 
-push_arg_empty_table(L) ->
-    luam:push_arg(L, {}),
+pushterm_empty_table(L) ->
+    luam:pushterm(L, {}),
     ?assertEqual(1, lua:gettop(L)),
     ?assertEqual(0, lua:objlen(L, 1)).
 
-push_arg_table1(L) ->
-    luam:push_arg(L, {true, {}, <<"yadda">>}),
+pushterm_table1(L) ->
+    luam:pushterm(L, {true, {}, <<"yadda">>}),
     ?assertEqual(1, lua:gettop(L)),
     ?assertEqual(3, lua:objlen(L, 1)),
     lua:pushnumber(L, 1), lua:gettable(L, 1), % push t[1]
@@ -66,8 +66,8 @@ push_arg_table1(L) ->
     lua:pushnumber(L, 3), lua:gettable(L, 1), % push t[3]
     ?assertEqual(string, lua:type(L, 4)).
 
-push_arg_nested_table(L) ->
-    luam:push_arg(L, {{true, nil}}),
+pushterm_nested_table(L) ->
+    luam:pushterm(L, {{true, nil}}),
     ?assertEqual(1, lua:gettop(L)),
     lua:pushnumber(L, 1), lua:gettable(L, 1),
     lua:pushnumber(L, 1), lua:gettable(L, 2),
