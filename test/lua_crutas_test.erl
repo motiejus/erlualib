@@ -12,3 +12,8 @@ put_atom_test() ->
     ?assertEqual(1, lua:gettop(L)),
     ?assertEqual(user_data, lua:type(L, 1)),
     ?assertEqual({ok, a1}, luam:maybe_atom(L, 1)).
+
+luam_call_with_atom_test() ->
+    {ok, L} = lua:new_state(),
+    ok = lual:dostring(L, <<"function t(arg) return erlang.atom(arg) end">>),
+    ?assertEqual(yadda, luam:call(L, "t", [<<"yadda">>])).

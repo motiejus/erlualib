@@ -97,6 +97,11 @@ toterm(L, N) ->
         boolean -> lua:toboolean(L, N);
         number -> lua:tonumber(L, N);
         string -> lua:tolstring(L, N);
+        user_data ->
+            case maybe_atom(L, N) of
+                {ok, Atom} -> Atom;
+                _ -> error(badarg)
+            end;
         table ->
             F = fun(K, V, Acc) -> [{K, V}|Acc] end,
             lists:reverse(fold(F, [], L, N))
