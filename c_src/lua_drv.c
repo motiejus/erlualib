@@ -8,6 +8,8 @@
 #include "lua_drv.h"
 #include "commands.h"
 
+#include "liberlang.h"
+
 static ErlDrvData start (ErlDrvPort port, char* cmd);
 static void stop (ErlDrvData handle);
 static void process (ErlDrvData handle, ErlIOVec *ev);
@@ -45,7 +47,9 @@ start(ErlDrvPort port, char *cmd)
   lua_State *L;
   L = luaL_newstate();
   luaL_openlibs(L);
-  
+
+  luaopen_erlang(L);
+
   lua_drv_t* retval = (lua_drv_t*) driver_alloc(sizeof(lua_drv_t));
   retval->port = port;
   retval->L = L;
@@ -156,6 +160,9 @@ process(ErlDrvData handle, ErlIOVec *ev)
     break;
   case ERL_LUAM_MULTICALL:
     erl_luam_multicall(driver_data, buf, index);
+    break;
+  case ERL_LUAM_IS_ATOM:
+    erl_luam_is_atom(driver_data, buf, index);
     break;
   
   default:

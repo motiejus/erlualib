@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "lua_drv.h"
+#include "liberlang.h"
 #include "commands.h"
 
 static void reply_ok(lua_drv_t *driver_data);
@@ -417,6 +418,21 @@ erl_luam_multicall(lua_drv_t *driver_data, char *buf, int index)
   driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
 }
 
+void
+erl_luam_is_atom(lua_drv_t *driver_data, char *buf, int index)
+{
+  long i;
+  int ret;
+  ei_decode_long(buf, &index, &i);
+  ret = luam_testudata(driver_data->L, i, "erlang.t_atom") != NULL;
+
+  ErlDrvTermData spec[] = {
+        ERL_DRV_ATOM,   ATOM_OK,
+        ERL_DRV_ATOM, driver_mk_atom(ret ? "true" : "false"),
+        ERL_DRV_TUPLE,  2
+  };
+  driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
+}
 
 void
 erl_lua_no_command(lua_drv_t *driver_data)

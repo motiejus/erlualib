@@ -140,6 +140,4 @@
 
 %% Motiejaus Lua constants
 -define(ERL_LUAM_MULTICALL,         200).
-
-% Constants
--define(ERL_LUA_MULTRET,            -1).
+-define(ERL_LUAM_IS_ATOM,           201).
