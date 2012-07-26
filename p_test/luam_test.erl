@@ -1,7 +1,5 @@
 -module(luam_test).
 
-%-define(PROPER_MODULE_TESTS, 1).
-%-include("proper_utils.hrl").
 -include_lib("proper/include/proper.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
@@ -63,6 +61,12 @@ prop_luam_call() ->
                 lists:map(fun sorted/1, Ret) =:= lists:map(fun sorted/1, Conv)
         end).
 
+-define(LUA_MOD, fun()->code:priv_dir(erlualib)++"/luam_one_call_test.lua" end).
+luam_one_call_test_() ->
+    [
+        ?_assertEqual(<<"bac">>, luam:one_call(?LUA_MOD(), "t", ['bac'])),
+        ?_assertEqual({lol, 4}, luam:one_call(?LUA_MOD(), "add", [1, 3]))
+    ].
 
 fold(L) ->
     lua:createtable(L, 0, 2),

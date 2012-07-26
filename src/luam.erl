@@ -43,18 +43,35 @@
 
 -include("lua_api.hrl").
 
--export([call/3, multicall/2, maybe_atom/2, pushterm/2]).
+-export([one_call/3, call/3, multicall/2, maybe_atom/2, pushterm/2]).
 -export([fold/4]).
 
 
 %% @doc Call FunName with Args. Return all arguments in tuple.
--spec call(lua:lua(), string(), list(lua:arg())) -> tuple(lua:ret()).
+-spec call(lua:lua(), string(), list(lua:arg())) -> lua:ret().
 call(L, FunName, Args) ->
     lua:getglobal(L, FunName),
     [pushterm(L, Arg) || Arg <- Args],
     N = multicall(L, length(Args)),
     lua:gettop(L),
     pop_results(L, N).
+
+%% @doc Call a function once. Initializes Lua, does luam:call, closes Lua
+%%
+%% Steps:
+%% 1. Create a new Lua state
+%% 2. Open and load the file
+%% 3. luam:call/4
+%% 4. Close Lua state
+%% 5. Return the result of luam:call
+-spec one_call(file:name(), string(), list(lua:arg())) -> lua:ret().
+one_call(File, FunName, Args) ->
+    {ok, L} = lua:new_state(),
+    {ok, Src} = file:read_file(File),
+    ok = lual:dostring(L, Src),
+    R = luam:call(L, FunName, Args),
+    lua:close(L),
+    R.
 
 %% @doc Push arbitrary variable on stack
 -spec pushterm(lua:lua(), lua:arg())  -> ok.
