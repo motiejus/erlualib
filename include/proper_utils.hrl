@@ -6,31 +6,17 @@
 -define(prop_check(Fun), ?prop_check(Fun, [])).
 -define(prop_check(Fun, Opts),
         fun() ->
-                run_proper(function,
+                proper_utils:run_proper(function,
                     fun() ->
                             R = proper:quickcheck(Fun(), Opts), ?mem(), R
                     end)
         end).
 
-%% @doc Changes group leader to proper, runs tests and gives group leader back
-%% to eunit. Needed for IO outputing.
--spec run_proper(module | function, fun()) -> none().
-run_proper(What, Fun) ->
-    EunitLeader = erlang:group_leader(),
-    erlang:group_leader(whereis(user), self()),
-    _ExpectedReturn = case What of
-        module -> [];
-        function -> true
-    end,
-    Fun(),
-    timer:sleep(100),
-    erlang:group_leader(EunitLeader, self()).
-
 -ifdef(PROPER_MODULE_TESTS).
 
 proper_test_() ->
     {timeout, 3600, fun() ->
-                run_proper(module,
+                proper_utils:run_proper(module,
                     fun() ->
                             ?assertEqual([], proper:module(?MODULE, [{max_size, 8}]))
                     end)
@@ -47,7 +33,7 @@ get_module_name(Mod) ->
 proper_spec_test_() ->
     Mod = get_module_name(?MODULE),
     {timeout, 3600, fun () ->
-            run_proper(module, fun() -> proper:check_specs(Mod) end)
+            proper_utils:run_proper(module, fun() -> proper:check_specs(Mod) end)
         end
     }.
 

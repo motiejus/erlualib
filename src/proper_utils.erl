@@ -2,7 +2,7 @@
 
 -export([run_proper/2]).
 
--spec run_proper(module | function, fun()) -> none().
+-spec run_proper(module | function, fun()) -> true.
 run_proper(What, Fun) ->
     EunitLeader = erlang:group_leader(),
     erlang:group_leader(whereis(user), self()),
