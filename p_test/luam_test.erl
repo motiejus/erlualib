@@ -18,6 +18,52 @@ oh_test_() ->
         {"multicall 2", ?_test(multicall_2(ns()))}
     ].
 
+luam_call_test_() ->
+    [
+        {"single nil", ?_assertEqual(nil, luam_call(['nil']))},
+        {"single atom", ?_assertEqual(<<"x">>, luam_call(['x']))},
+        {"1 number", ?_assertEqual(nil, luam_call([nil]))},
+        {"number and string", ?_assertEqual(
+                {4, <<"bac">>}, luam_call([4, <<"bac">>]))},
+        {"numeric proplist", ?_assertEqual(
+                [{1, 4}], luam_call([[{1, 4}]]))
+        },
+        {"string proplist", ?_assertEqual(
+                [{<<"x">>, <<"y">>}], luam_call([[{'x', 'y'}]]))},
+        {"2 numeric arguments", ?_assertEqual({1, 2}, luam_call([1, 2]))},
+        {"number and empty table", ?_assertEqual({1, []}, luam_call([1, []]))},
+        {"3 booleans and number", ?_assertEqual(
+                {true, false, true, 4}, luam_call([true, false, true, 4]))},
+        {"number and table", ?_assertEqual(
+                {5, [{<<"x">>, <<"y">>}]}, luam_call([5, [{'x', 'y'}]]))}
+    ].
+
+proper_test_() ->
+    {timeout, 3600, fun() ->
+                proper_utils:run_proper(module,
+                    fun() ->
+                            ?assertEqual([], proper:module(?MODULE,
+                                    [{max_size, 8}, {numtests, 1000}]))
+                    end)
+        end
+    }.
+
+prop_luam_call() ->
+    ?FORALL(Args,
+        ?SUCHTHAT(Args, list(arg()), valid(Args)
+        ),
+        begin
+                Ret = case luam_call(Args) of
+                    X when is_tuple(X) -> tuple_to_list(X);
+                    X -> [X]
+                end,
+
+                Conv = lists:map(fun arg_to_ret/1, Args),
+                %io:format("Arg: ~p, Ret: ~p, Conv: ~p~n", [Args, Ret, Conv]),
+                lists:map(fun sorted/1, Ret) =:= lists:map(fun sorted/1, Conv)
+        end).
+
+
 fold(L) ->
     lua:createtable(L, 0, 2),
     lua:pushlstring(L, <<"vienas">>),
@@ -97,26 +143,6 @@ multicall_2(L) ->
     ?assertEqual(number, lua:type(L, -1)), % return value
     ?assertEqual(number, lua:type(L, -2)). % return value
 
-luam_call_test_() ->
-    [
-        {"single nil", ?_assertEqual(nil, luam_call(['nil']))},
-        {"single atom", ?_assertEqual(<<"x">>, luam_call(['x']))},
-        {"1 number", ?_assertEqual(nil, luam_call([nil]))},
-        {"number and string", ?_assertEqual(
-                {4, <<"bac">>}, luam_call([4, <<"bac">>]))},
-        {"numeric proplist", ?_assertEqual(
-                [{1, 4}], luam_call([[{1, 4}]]))
-        },
-        {"string proplist", ?_assertEqual(
-                [{<<"x">>, <<"y">>}], luam_call([[{'x', 'y'}]]))},
-        {"2 numeric arguments", ?_assertEqual({1, 2}, luam_call([1, 2]))},
-        {"number and empty table", ?_assertEqual({1, []}, luam_call([1, []]))},
-        {"3 booleans and number", ?_assertEqual(
-                {true, false, true, 4}, luam_call([true, false, true, 4]))},
-        {"number and table", ?_assertEqual(
-                {5, [{<<"x">>, <<"y">>}]}, luam_call([5, [{'x', 'y'}]]))}
-    ].
-
 luam_call(Args) ->
     {ok, L} = lua:new_state(),
     ok = lual:dostring(L, <<"function t(...) return ... end">>),
@@ -151,30 +177,6 @@ sorted(List) when is_list(List) ->
 sorted(X) ->
     X.
 
-prop_luam_call() ->
-    ?FORALL(Args,
-        ?SUCHTHAT(Args, list(arg()), valid(Args)
-        ),
-        begin
-                Ret = case luam_call(Args) of
-                    X when is_tuple(X) -> tuple_to_list(X);
-                    X -> [X]
-                end,
-
-                Conv = lists:map(fun arg_to_ret/1, Args),
-                %io:format("Arg: ~p, Ret: ~p, Conv: ~p~n", [Args, Ret, Conv]),
-                lists:map(fun sorted/1, Ret) =:= lists:map(fun sorted/1, Conv)
-        end).
-
-proper_test_() ->
-    {timeout, 3600, fun() ->
-                proper_utils:run_proper(module,
-                    fun() ->
-                            ?assertEqual([], proper:module(?MODULE,
-                                    [{max_size, 8}, {numtests, 1000}]))
-                    end)
-        end
-    }.
 
 arg_to_ret(A) when A =:= nil; is_boolean(A); is_number(A); is_binary(A) ->
     A;
