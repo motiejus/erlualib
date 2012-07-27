@@ -21,39 +21,39 @@ Below is an example of simple key-value name server. It has 2 operations:
 ==== `name_server.erl` ====
 
 {% highlight erlang %}
-    -module(name_server).
-    -behaviour(gen_server).
-    -implemented_in({priv, "/name_server.lua"}).
-    -compile({parse_transform, lua_behaviour}).
+-module(name_server).
+-behaviour(gen_server).
+-implemented_in({priv, "/name_server.lua"}).
+-compile({parse_transform, lua_behaviour}).
 {% endhighlight %}
 
 ==== `priv/name_server.lua` ====
 
 {% highlight lua %}
-    function init()
-        return erlang.atom("ok"), {} -- This empty table will be our state
-    end
+function init()
+    return erlang.atom("ok"), {} -- This empty table will be our state
+end
 
-    -- Forwards the call to function which is specified in req[1]. Returns
-    -- {reply, Return, NewTable}. Return and NewTable are values from the
-    -- forwarded module.
-    function handle_call(req, from, tbl)
-        return erlang.atom("reply"), call(tbl, req)
-    end
+-- Forwards the call to function which is specified in req[1]. Returns
+-- {reply, Return, NewTable}. Return and NewTable are values from the
+-- forwarded module.
+function handle_call(req, from, tbl)
+    return erlang.atom("reply"), call(tbl, req)
+end
 
-    -- Adds name to State. Returns {ok, Table}.
-    function add_name(tbl, name, address)
-        tbl[name] = address
-        return erlang.atom("ok"), tbl
-    end
+-- Adds name to State. Returns {ok, Table}.
+function add_name(tbl, name, address)
+    tbl[name] = address
+    return erlang.atom("ok"), tbl
+end
 
-    -- Gets name table and current name. Returns: { 'error' | Value, Table}
-    function get_addr(tbl, name)
-        return tbl[name] or erlang.atom("error"), tbl
-    end
+-- Gets name table and current name. Returns: { 'error' | Value, Table}
+function get_addr(tbl, name)
+    return tbl[name] or erlang.atom("error"), tbl
+end
 
-    -- Call req[1](tbl, req[2], req[3], ...)
-    function call(tbl, req) return _G[req[1]](tbl, unpack(req, 2)) end
+-- Call req[1](tbl, req[2], req[3], ...)
+function call(tbl, req) return _G[req[1]](tbl, unpack(req, 2)) end
 {% endhighlight %}
 
 That's it! Compile `name_server.erl` and call it. Alternatively, download the
