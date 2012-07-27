@@ -64,10 +64,13 @@ call(L, FunName, Args) ->
 %% 3. luam:call/4
 %% 4. Close Lua state
 %% 5. Return the result of luam:call
--spec one_call(file:name(), string(), list(lua:arg())) -> lua:ret().
+-spec one_call(file:name(),string(),list(lua:arg())) -> lua:ret() | no_return().
 one_call(File, FunName, Args) ->
     {ok, L} = lua:new_state(),
-    {ok, Src} = file:read_file(File),
+    Src = case file:read_file(File) of
+        {ok, Bin} -> Bin;
+        {error, Err} -> error({error_reading_file, File, Err})
+    end,
     ok = lual:dostring(L, Src),
     R = luam:call(L, FunName, Args),
     lua:close(L),
