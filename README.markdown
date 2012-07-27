@@ -20,13 +20,16 @@ Below is an example of simple key-value name server. It has 2 operations:
 
 ==== `name_server.erl` ====
 
+{% highlight erlang %}
     -module(name_server).
     -behaviour(gen_server).
     -implemented_in({priv, "/name_server.lua"}).
     -compile({parse_transform, lua_behaviour}).
+{% endhighlight %}
 
 ==== `priv/name_server.lua` ====
 
+{% highlight lua %}
     function init()
         return erlang.atom("ok"), {} -- This empty table will be our state
     end
@@ -51,6 +54,7 @@ Below is an example of simple key-value name server. It has 2 operations:
 
     -- Call req[1](tbl, req[2], req[3], ...)
     function call(tbl, req) return _G[req[1]](tbl, unpack(req, 2)) end
+{% endhighlight %}
 
 That's it! Compile `name_server.erl` and call it. Alternatively, download the
 [example][crutas] and `make test`.
