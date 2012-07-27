@@ -77,13 +77,15 @@ one_call(File, FunName, Args) ->
     R.
 
 %% @doc Push arbitrary variable on stack
--spec pushterm(lua:lua(), lua:arg())  -> ok.
-pushterm(L, nil)                      -> lua:pushnil(L);
-pushterm(L, Arg) when is_boolean(Arg) -> lua:pushboolean(L, Arg);
-pushterm(L, Arg) when is_atom(Arg)    -> lua:pushlstring(L, a2b(Arg));
-pushterm(L, Arg) when is_binary(Arg)  -> lua:pushlstring(L, Arg);
-pushterm(L, Arg) when is_number(Arg)  -> lua:pushnumber(L, Arg);
-pushterm(L, Args) when is_tuple(Args) ->
+-spec pushterm(lua:lua(), lua:arg())    -> ok.
+pushterm(L, Arg) when is_pid(Arg)       -> lua:pushnil(L); % TODO: UNSUPPORTED
+pushterm(L, Arg) when is_reference(Arg) -> lua:pushnil(L); % TODO: UNSUPPORTED
+pushterm(L, nil)                        -> lua:pushnil(L);
+pushterm(L, Arg) when is_boolean(Arg)   -> lua:pushboolean(L, Arg);
+pushterm(L, Arg) when is_atom(Arg)      -> lua:pushlstring(L, a2b(Arg));
+pushterm(L, Arg) when is_binary(Arg)    -> lua:pushlstring(L, Arg);
+pushterm(L, Arg) when is_number(Arg)    -> lua:pushnumber(L, Arg);
+pushterm(L, Args) when is_tuple(Args)   ->
     Proplist = lists:zip(lists:seq(1, size(Args)), tuple_to_list(Args)),
     pushterm(L, Proplist);
 pushterm(L, Args) when is_list(Args) ->
