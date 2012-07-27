@@ -1,8 +1,5 @@
 Erlualib enables us to implement arbitrary Erlang behavious in Lua. This
-library allows to embed Lua code to Erlang codebase very easily and
-transparently.
-
-How to do it:
+library makes embedding Lua code to Erlang codebase very easy. How to do it:
 
 1. Create an Erlang module which you want to implement in Lua
 2. Add 4 lines:
@@ -11,7 +8,6 @@ How to do it:
     3. `-implemented_in({priv, "/module_impl.lua"}). % where to forward calls`
     4. `-compile({parse_transform, lua_behaviour}). % this does the hard work`
 3. Compile and use `my_mod` as if it was written in pure Erlang.
-Forwarding to and from Lua is transparent.
 
 Below is an example of simple key-value name server. It has 2 operations:
 
@@ -33,25 +29,21 @@ Below is an example of simple key-value name server. It has 2 operations:
 function init()
     return erlang.atom("ok"), {} -- This empty table will be our state
 end
-
 -- Forwards the call to function which is specified in req[1]. Returns
 -- {reply, Return, NewTable}. Return and NewTable are values from the
 -- forwarded module.
 function handle_call(req, from, tbl)
     return erlang.atom("reply"), call(tbl, req)
 end
-
 -- Adds name to State. Returns {ok, Table}.
 function add_name(tbl, name, address)
     tbl[name] = address
     return erlang.atom("ok"), tbl
 end
-
 -- Gets name table and current name. Returns: { 'error' | Value, Table}
 function get_addr(tbl, name)
     return tbl[name] or erlang.atom("error"), tbl
 end
-
 -- Call req[1](tbl, req[2], req[3], ...)
 function call(tbl, req) return _G[req[1]](tbl, unpack(req, 2)) end
 ```
