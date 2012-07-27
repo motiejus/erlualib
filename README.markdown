@@ -1,19 +1,105 @@
-Erl-Lua is a library for embedding Lua into Erlang. It provides a simple
-interface that is very similar to the Lua C API, as well as some very useful
-high-level functions.
+Erlualib enables us to implement arbitrary Erlang behavious in Lua. This
+library allows to embed Lua code to Erlang codebase very easily and
+transparently.
 
-This is a fork of Ray Morgan's [Erl-Lua] library with the following changes:
+How to do it:
 
-* High test coverage
-* Some new low-level commands
+1. Create an Erlang module which you want to implement in Lua
+2. Add 4 lines:
+    1. `-module(my_mod).`
+    2. `-behaviour(abitrary_behaviour).`
+    3. `-implemented_in({priv, "/module_impl.lua"}). % where to forward calls`
+    4. `-compile({parse_transform, lua_behaviour}). % this does the hard work`
+3. Compile and use `my_mod` as if it was written in pure Erlang.
+Forwarding to and from Lua is transparent.
+
+Below is an example of simple key-value name server. It has 2 operations:
+
+* `{add_name, Key :: binary(), Value :: binary()} -> ok.`
+* `{get_addr, Key :: binary()} -> 'error' | Value :: binary().`
+
+==== `name_server.erl` ====
+
+    -module(name_server).
+    -behaviour(gen_server).
+    -implemented_in({priv, "/name_server.lua"}).
+    -compile({parse_transform, lua_behaviour}).
+
+==== `priv/name_server.lua` ====
+
+    function init()
+        return erlang.atom("ok"), {} -- This empty table will be our state
+    end
+
+    -- Forwards the call to function which is specified in req[1]. Returns
+    -- {reply, Return, NewTable}. Return and NewTable are values from the
+    -- forwarded module.
+    function handle_call(req, from, tbl)
+        return erlang.atom("reply"), call(tbl, req)
+    end
+
+    -- Adds name to State. Returns {ok, Table}.
+    function add_name(tbl, name, address)
+        tbl[name] = address
+        return erlang.atom("ok"), tbl
+    end
+
+    -- Gets name table and current name. Returns: { 'error' | Value, Table}
+    function get_addr(tbl, name)
+        return tbl[name] or erlang.atom("error"), tbl
+    end
+
+    -- Call req[1](tbl, req[2], req[3], ...)
+    function call(tbl, req) return _G[req[1]](tbl, unpack(req, 2)) end
+
+That's it! Compile `name_server.erl` and call it. Alternatively, download the
+[example][crutas] and `make test`.
+
+Performance
+===========
+`luam:one_call/3` (the "do all" function) consists of 3 parts:
+
+1. `lua:new_state/0`, takes ~220-250µs.
+2. `luam:call/4`, takes ~12-15µs.
+3. `lua:close/1`, negligible.
+
+For `lua_behaviour`, new Lua state is created on every request, which
+adds significant overhead. In `gen_(server|fsm)` case (as well as many
+others), it will be possible to reuse the state, and performance will be
+much, much better. I just need to create `gen_(server|fsm)` specific
+`parse_transform` for it, which is planned for near future.
+
+Type conversions Lua -> Erlang
+==============================
+As you already noticed in the Lua example, "erlang" lua library is
+available! Now it has only one method `atom`, which takes a string and
+returns atom. Analogue `tuple` method is planned (now, when you return
+an indexed table in Lua, it is treated as a proplist with numeric
+indices, so there is no way to return nested tuples).
+
+Some words about erlualib
+=========================
+erlualib is a library for embedding Lua into Erlang. It provides a
+simple interface that is very similar to the Lua C API, as well as some
+very useful high-level functions.
+
+This is a fork of Ray Morgan's Erl-Lua library with the following
+changes:
+
+* High test coverage (and PropEr tests)
+* New low-level commands
 * Strings in Lua are Binaries in Erlang (instead of lists of numbers)
 * Many bugfixes
 * Dialyzer is happy about this project
-* Rebar
-* Major new feature: `luam:call/4`.
+* Rebarized
+* `luam:call/4`.
+* arbitrary erlang behaviours in Lua
 
-The following is in progress:
-* [Erlang behaviours in Lua]
+Erlualib is a nice example how and when to PropErly test things. Tests
+for `parse_transforms` are coming soon.
+
+Lower level function examlpes
+=============================
 
 Example how to use `luam:call/4`:
 
@@ -54,10 +140,10 @@ There is also a simple way to run one off simple Lua code snippets:
 Testing
 =======
 
-Code has 100% non-boilerplate test coverage, some of which is PropErly covered.
 To test the whole project and see eUnit and PropEr in action, run:
 
     make test
 
+[crutas]: https://github.com/Motiejus/crutas
 [Erl-Lua]: https://github.com/raycmorgan/erl-lua/
 [Erlang behaviours in Lua]: http://m.jakstys.lt/tech/2012/06/erlang-behaviours-in-lua/
