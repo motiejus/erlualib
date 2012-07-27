@@ -49,7 +49,7 @@ function call(tbl, req) return _G[req[1]](tbl, unpack(req, 2)) end
 ```
 
 That's it! Compile `name_server.erl` and call it. Alternatively, download the
-[example][crutas] and `make test`.
+[example][erlualib_examples] and `make test`.
 
 Performance
 ===========
@@ -140,6 +140,6 @@ To test the whole project and see eUnit and PropEr in action, run:
 
     make test
 
-[crutas]: https://github.com/Motiejus/crutas
+[erlualib_examples]: https://github.com/Motiejus/erlualib_examples
 [Erl-Lua]: https://github.com/raycmorgan/erl-lua/
 [Erlang behaviours in Lua]: http://m.jakstys.lt/tech/2012/06/erlang-behaviours-in-lua/
