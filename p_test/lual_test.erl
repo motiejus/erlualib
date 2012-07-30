@@ -4,4 +4,4 @@
 
 failure_test() ->
     {ok, L} = lua:new_state(),
-    ?assertMatch({error, _}, lual:dostring(L, <<"syntax @#%^&#@$@ error!!!">>)).
+    ?assertThrow(_, lual:dostring(L, <<"syntax @#%^&#@$@ error!!!">>)).

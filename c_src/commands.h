@@ -142,4 +142,4 @@
 #define ERL_LUAM_MAYBE_ATOM        201
 
 #define ATOM_OK driver_mk_atom("ok")
-#define ATOM_ERROR driver_mk_atom("error")
+#define ATOM_THROW driver_mk_atom("throw")

@@ -10,7 +10,7 @@
 #include "commands.h"
 
 static void reply_ok(lua_drv_t *driver_data);
-static void reply_error(lua_drv_t *driver_data, const char*);
+static void reply_throw(lua_drv_t *driver_data, const char*);
 static char* decode_string(const char *buf, int *index);
 static char* decode_binary(const char *buf, int *index, int *len);
 
@@ -394,7 +394,7 @@ erl_lual_dostring(lua_drv_t *driver_data, char *buf, int index)
   if (!luaL_dostring(driver_data->L, code))
     reply_ok(driver_data);
   else
-    reply_error(driver_data, lua_tostring(driver_data->L, -1));
+    reply_throw(driver_data, lua_tostring(driver_data->L, -1));
   free(code);
 }
 
@@ -451,12 +451,7 @@ erl_luam_maybe_atom(lua_drv_t *driver_data, char *buf, int index)
 void
 erl_lua_no_command(lua_drv_t *driver_data)
 {  
-  ErlDrvTermData spec[] = {
-        ERL_DRV_ATOM,   ATOM_ERROR,
-        ERL_DRV_STRING, (ErlDrvTermData) "No Command Found", 16,
-        ERL_DRV_TUPLE,  2
-  };
-  driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
+    reply_throw(driver_data, "No Command Found");
 }
 
 
@@ -468,10 +463,10 @@ reply_ok(lua_drv_t *driver_data)
 }
 
 static void
-reply_error(lua_drv_t *driver_data, const char *err)
+reply_throw(lua_drv_t *driver_data, const char *err)
 {
   ErlDrvTermData spec[] = {
-        ERL_DRV_ATOM,   ATOM_ERROR,
+        ERL_DRV_ATOM,   ATOM_THROW,
         ERL_DRV_STRING, (ErlDrvTermData) err, strlen(err),
         ERL_DRV_TUPLE,  2
   };

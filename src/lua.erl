@@ -70,29 +70,29 @@ close(L) ->
 -spec call(lua(), non_neg_integer(), non_neg_integer()) -> ok.
 call(L, Args, Results) ->
     lua_common:command(L, {?ERL_LUA_CALL, Args, Results}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec concat(lua(), index()) -> ok.
 concat(L, N) ->
     lua_common:command(L, {?ERL_LUA_CONCAT, N}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec getfield(lua(), global | index(), lua_name()) -> ok.
 getfield(L, global, Name) ->
     getglobal(L, Name);
 getfield(L, Index, Name) ->
     lua_common:command(L, {?ERL_LUA_GETFIELD, Index, Name}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
     
 -spec getglobal(lua(), lua_name()) -> ok.
 getglobal(L, Name) ->
     lua_common:command(L, {?ERL_LUA_GETGLOBAL, Name}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec gettable(lua(), index()) -> ok.
 gettable(L, Index) ->
     lua_common:command(L, {?ERL_LUA_GETTABLE, Index}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec gettop(lua()) -> abs_index().
 gettop(L) ->
@@ -102,7 +102,7 @@ gettop(L) ->
 -spec newtable(lua()) -> ok.
 newtable(L) ->
     lua_common:command(L, {?ERL_LUA_NEWTABLE}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec next(lua(), index()) -> integer().
 next(L, Index) ->
@@ -117,49 +117,49 @@ objlen(L, Index) ->
 -spec createtable(lua(), non_neg_integer(), non_neg_integer()) -> ok.
 createtable(L, Narr, Nrec) ->
     lua_common:command(L, {?ERL_LUA_CREATETABLE, Narr, Nrec}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec pushboolean(lua(), boolean()) -> ok.
 pushboolean(L, Bool) ->
     lua_common:command(L, {?ERL_LUA_PUSHBOOLEAN, Bool}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec pushinteger(lua(), integer()) -> ok.
 pushinteger(L, Int) when is_integer(Int) ->
     lua_common:command(L, {?ERL_LUA_PUSHINTEGER, Int}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec pushlstring(lua(), binary()) -> ok.
 pushlstring(L, String) when is_binary(String) ->
     lua_common:command(L, {?ERL_LUA_PUSHLSTRING, String}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec pushnil(lua()) -> ok.
 pushnil(L) ->
     lua_common:command(L, {?ERL_LUA_PUSHNIL}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec pushnumber(lua(), number()) -> ok.
 pushnumber(L, Num) when is_number(Num) ->
     lua_common:command(L, {?ERL_LUA_PUSHNUMBER, Num}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec remove(lua(), index()) -> ok.
 remove(L, Index) ->
     lua_common:command(L, {?ERL_LUA_REMOVE, Index}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec setfield(lua(), global | index(), string()) -> ok.
 setfield(L, global, Name) ->
     setglobal(L, Name);
 setfield(L, Index, Name) ->
     lua_common:command(L, {?ERL_LUA_SETFIELD, Index, Name}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec setglobal(lua(), string()) -> ok.
 setglobal(L, Name) ->
     lua_common:command(L, {?ERL_LUA_SETGLOBAL, Name}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec toboolean(lua(), index()) -> boolean().
 toboolean(L, Index) ->
@@ -184,7 +184,7 @@ tonumber(L, Index) ->
 -spec settable(lua(), index()) -> ok.
 settable(L, Index) ->
     lua_common:command(L, {?ERL_LUA_SETTABLE, Index}),
-    lua_common:receive_simple_response().
+    lua_common:receive_valued_response().
 
 -spec type(lua(), index()) -> lua_type().
 type(L, Index) ->
