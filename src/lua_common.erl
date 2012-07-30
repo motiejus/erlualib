@@ -21,10 +21,10 @@ receive_simple_response() ->
 
 receive_valued_response() ->
     receive
-        {ok, Str} ->
-            Str;
-        Other ->
-            throw({lua_error, Other})
+        ok -> ok;
+        {ok, Str} -> Str;
+        {throw, Throw} -> throw(Throw);
+        Other -> throw({unknown_return, Other})
     after ?STD_TIMEOUT ->
             error(timeout)
     end.
