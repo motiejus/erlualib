@@ -43,7 +43,7 @@
 
 -include("lua_api.hrl").
 
--export([one_call/3, call/3, multicall/2, maybe_atom/2, pushterm/2]).
+-export([one_call/3, call/3, multipcall/2, maybe_atom/2, pushterm/2]).
 -export([fold/4]).
 
 
@@ -52,7 +52,7 @@
 call(L, FunName, Args) ->
     lua:getglobal(L, FunName),
     [pushterm(L, Arg) || Arg <- Args],
-    N = multicall(L, length(Args)),
+    N = multipcall(L, length(Args)),
     lua:gettop(L),
     pop_results(L, N).
 
@@ -151,9 +151,9 @@ fold( Fun, Acc, L,   N, _) ->
 %%
 %% Equivalent to lua:call(L, N, LUA_MULTRET), but returns how many arguments
 %% function returned. Pops function from the stack.
--spec multicall(lua:lua(), non_neg_integer()) -> non_neg_integer().
-multicall(L, N) ->
-    lua_common:command(L, {?ERL_LUAM_MULTICALL, N}),
+-spec multipcall(lua:lua(), non_neg_integer()) -> non_neg_integer().
+multipcall(L, N) ->
+    lua_common:command(L, {?ERL_LUAM_MULTIPCALL, N}),
     lua_common:receive_valued_response().
 
 -spec a2b(atom()) -> binary().

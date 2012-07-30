@@ -399,7 +399,7 @@ erl_lual_dostring(lua_drv_t *driver_data, char *buf, int index)
 }
 
 void
-erl_luam_multicall(lua_drv_t *driver_data, char *buf, int index)
+erl_luam_multipcall(lua_drv_t *driver_data, char *buf, int index)
 {
   long args, level, ret_results;
   ei_decode_long(buf, &index, &args);
@@ -407,15 +407,25 @@ erl_luam_multicall(lua_drv_t *driver_data, char *buf, int index)
   /* level := function's index - 1 */
   level = lua_gettop(driver_data->L) - args - 1;
 
-  lua_call(driver_data->L, args, LUA_MULTRET);
-
-  ret_results = lua_gettop(driver_data->L) - level;
-  ErlDrvTermData spec[] = {
-        ERL_DRV_ATOM,   ATOM_OK,
-        ERL_DRV_INT, (ErlDrvTermData) ret_results,
-        ERL_DRV_TUPLE,  2
-  };
-  driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
+  if(lua_pcall(driver_data->L, args, LUA_MULTRET, 0) == 0) {
+      ret_results = lua_gettop(driver_data->L) - level;
+      ErlDrvTermData spec[] = {
+          ERL_DRV_ATOM,   ATOM_OK,
+          ERL_DRV_INT, (ErlDrvTermData) ret_results,
+          ERL_DRV_TUPLE,  2
+      };
+      driver_output_term(driver_data->port,spec,sizeof(spec)/sizeof(spec[0]));
+  } else {
+      const char *err = lua_tostring(driver_data->L, -1);
+      ErlDrvTermData spec[] = {
+          ERL_DRV_ATOM,   ATOM_THROW,
+            ERL_DRV_ATOM, driver_mk_atom("lua_error"),
+            ERL_DRV_STRING, (ErlDrvTermData) err, strlen(err),
+            ERL_DRV_TUPLE,  2,
+          ERL_DRV_TUPLE,  2
+      };
+      driver_output_term(driver_data->port,spec,sizeof(spec)/sizeof(spec[0]));
+  }
 }
 
 void

@@ -11,9 +11,10 @@ oh_test_() ->
         {"push arg empty table", ?_test(pushterm_empty_table(ns()))},
         {"push arg table 1", ?_test(pushterm_table1(ns()))},
         {"push arg nested table", ?_test(pushterm_nested_table(ns()))},
-        {"multicall 0", ?_test(multicall_0(ns()))},
-        {"multicall 1", ?_test(multicall_1(ns()))},
-        {"multicall 2", ?_test(multicall_2(ns()))}
+        {"multipcall 000", ?_test(multipcall_000(ns()))},
+        {"multipcall 001", ?_test(multipcall_001(ns()))},
+        {"multipcall 002", ?_test(multipcall_002(ns()))},
+        {"multipcall err", ?_test(multipcall_err(ns()))}
     ].
 
 luam_call_test_() ->
@@ -125,27 +126,32 @@ pushterm_nested_table(L) ->
     lua:pushnumber(L, 2), lua:gettable(L, 2),
     ?assertEqual(nil, lua:type(L, -1)).
 
-multicall_0(L) ->
+multipcall_000(L) ->
     ok = lual:dostring(L, <<"function t(...) local noop end">>),
     lua:getglobal(L, "t"),
-    ?assertEqual(0, luam:multicall(L, 0)),
+    ?assertEqual(0, luam:multipcall(L, 0)),
     ?assertEqual(0, lua:gettop(L)).
 
 
-multicall_1(L) ->
+multipcall_001(L) ->
     ok = lual:dostring(L, <<"function t(...) return (1) end">>),
     lua:getglobal(L, "t"),
-    ?assertEqual(1, luam:multicall(L, 0)),
+    ?assertEqual(1, luam:multipcall(L, 0)),
     ?assertEqual(1, lua:gettop(L)),
     ?assertEqual(number, lua:type(L, -1)). % return value
 
-multicall_2(L) ->
+multipcall_002(L) ->
     ok = lual:dostring(L, <<"function t(...) return 1, 2 end">>),
     lua:getglobal(L, "t"),
-    ?assertEqual(2, luam:multicall(L, 0)),
+    ?assertEqual(2, luam:multipcall(L, 0)),
     ?assertEqual(2, lua:gettop(L)),
     ?assertEqual(number, lua:type(L, -1)), % return value
     ?assertEqual(number, lua:type(L, -2)). % return value
+
+multipcall_err(L) ->
+    ok = lual:dostring(L, <<"function t() f = nil; f() end">>),
+    lua:getglobal(L, "t"),
+    ?assertThrow({lua_error, S} when is_list(S), luam:multipcall(L, 0)).
 
 luam_call(Args) ->
     {ok, L} = lua:new_state(),

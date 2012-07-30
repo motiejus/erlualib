@@ -66,7 +66,7 @@ new_state() ->
 close(L) ->
     lua_driver:close(L).
 
-%% @doc Calls a function.
+%% @doc Calls a function
 -spec call(lua(), non_neg_integer(), non_neg_integer()) -> ok.
 call(L, Args, Results) ->
     lua_common:command(L, {?ERL_LUA_CALL, Args, Results}),

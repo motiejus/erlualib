@@ -65,6 +65,10 @@ others), it will be possible to reuse the state, and performance will be
 much, much better. I just need to create `gen_(server|fsm)` specific
 `parse_transform` for it, which is planned for near future.
 
+Tested on Intel Core 2 Q9400. Performance tests are not scientific, in order to
+give general overview.  Tests were executed serially, with SMP support. More
+scientific benchmarks are upcoming.
+
 Type conversions Lua -> Erlang
 ==============================
 As you already noticed in the Lua example, "erlang" lua library is
@@ -72,6 +76,13 @@ available! Now it has only one method `atom`, which takes a string and
 returns atom. Analogue `tuple` method is planned (now, when you return
 an indexed table in Lua, it is treated as a proplist with numeric
 indices, so there is no way to return nested tuples).
+
+Error handling
+==============
+
+When Lua code encounters an error in `luam:call/3`, `lua:multipcall/2` or
+`lua:one_call/3`, Erlang exception is thrown: `{lua_error, Error}`, where
+`Error` is a `string()`, the exception value from Lua.
 
 Some words about erlualib
 =========================

@@ -138,7 +138,7 @@
 #define ERL_LUAL_UNREF             132
 #define ERL_LUAL_WHERE             133
 
-#define ERL_LUAM_MULTICALL         200
+#define ERL_LUAM_MULTIPCALL        200
 #define ERL_LUAM_MAYBE_ATOM        201
 
 #define ATOM_OK driver_mk_atom("ok")
