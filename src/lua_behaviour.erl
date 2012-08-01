@@ -41,31 +41,28 @@
 -export([parse_transform/2]).
 
 parse_transform(Ast, _Opts) ->
-    {Ret, _Opt} = walk_ast(Ast, [], []),
+    {Ret, _Opt} = lists:foldl(fun walk_ast/2, {[], []}, Ast),
     %io:format("Opt: ~p~nRet: ~p~n", [Opt, Ret]),
-    Ret.
+    lists:reverse(Ret).
 
-walk_ast([], AstOut, PL) ->
-    {lists:reverse(AstOut), PL};
+walk_ast(N={attribute, _, module, Mod}, {AstOut, PL}) ->
+    {[N|AstOut], [{module, Mod}|PL]};
 
-walk_ast([N={attribute, _, module, Mod}|Rest], AstOut, PL) ->
-    walk_ast(Rest, [N|AstOut], [{module, Mod}|PL]);
+walk_ast(N={attribute, _, behaviour, Mod}, {AstOut, PL}) ->
+    {[N|AstOut], [{behaviour, Mod}|PL]};
 
-walk_ast([N={attribute, _, behaviour, Mod}|Rest], AstOut, PL) ->
-    walk_ast(Rest, [N|AstOut], [{behaviour, Mod}|PL]);
-
-walk_ast([N={attribute, _, implemented_in, Eval}|Rest], AstOut, PL) ->
+walk_ast(N={attribute, _, implemented_in, Eval}, {AstOut, PL}) ->
     LuaModABS = get_lua_mod_expr(get_value(module, PL), Eval),
-    walk_ast(Rest, [N|AstOut], [{implemented_in, LuaModABS}|PL]);
+    {[N|AstOut], [{implemented_in, LuaModABS}|PL]};
 
-walk_ast([{eof, L}|Rest], AstOut, PL) ->
+walk_ast({eof, L}, {AstOut, PL}) ->
     Funs = (get_value(behaviour, PL)):behaviour_info(callbacks),
     Export = {attribute,L,export,Funs},
     {EL, FunNodes} = make_fun_nodes(L, Funs, get_value(implemented_in, PL)),
-    walk_ast(Rest, lists:append([[{eof, EL}], FunNodes, [Export], AstOut]), PL);
+    {lists:append([[{eof, EL}], FunNodes, [Export], AstOut]), PL};
 
-walk_ast([Node|Rest], AstOut, PL) ->
-    walk_ast(Rest, [Node|AstOut], PL).
+walk_ast(Node, {AstOut, PL}) ->
+    {[Node|AstOut], PL}.
 
 get_value(Key, PL) ->
     Ref = make_ref(),
