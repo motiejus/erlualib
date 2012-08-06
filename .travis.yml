@@ -12,4 +12,3 @@ branches:
 
 env:
     - LUA=liblua5.1-0-dev
-    - LUA=liblualib50-dev
