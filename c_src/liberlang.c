@@ -30,15 +30,17 @@ static const struct luaL_Reg liberlang[] = {
 };
 
 int luaopen_erlang(lua_State *L) {
-    luaL_newmetatable(L, "erlang.t_atom");
+    lua_newtable(L);
 
 #if LUA_VERSION_NUM > 501
-    lua_newtable(L);
     luaL_setfuncs (L, liberlang, 0);
-    lua_setglobal(L, "erlang");
 #else
-    luaL_register(L, "erlang", liberlang);
+    luaL_register(L, NULL, liberlang);
 #endif
-    lua_pop(L, 2);
+    lua_setglobal(L, "erlang");
+
+    luaL_newmetatable(L, "erlang.t_atom");
+    lua_pop(L, 1);
+
     return 1;
 }
