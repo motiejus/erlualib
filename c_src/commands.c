@@ -59,7 +59,12 @@ erl_lua_objlen(lua_drv_t *driver_data, char *buf, int index)
   size_t size;
   
   ei_decode_long(buf, &index, &i);
+
+#if LUA_VERSION_NUM > 501
+  size = lua_rawlen(driver_data->L, i);
+#else
   size = lua_objlen(driver_data->L, i);
+#endif
 
   ErlDrvTermData spec[] = {
         ERL_DRV_ATOM,   ATOM_OK,
