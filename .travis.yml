@@ -3,7 +3,7 @@ otp_release: R15B
 script: "make test"
 before_install:
     - sudo add-apt-repository -y ppa:motiejus/backports
-    - sudo apt-get update
+    - sudo apt-get update -qq
     - sudo apt-get install $LUA
 
 env:
