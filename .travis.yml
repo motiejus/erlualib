@@ -3,9 +3,13 @@ otp_release: R15B
 script: "make test"
 before_install:
     - sudo apt-get update -qq
-    - sudo apt-get install liblua5.1-0-dev
+    - sudo apt-get install $LUA
 
 branches:
     only:
         - master
         - travis
+
+env:
+    - LUA=liblua5.1-0-dev
+    - LUA=liblualib50-dev
