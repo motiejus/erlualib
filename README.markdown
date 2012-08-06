@@ -154,16 +154,18 @@ To test the whole project and see eUnit and PropEr in action, run:
 Compatibility
 =============
 
-* liblua 5.1 fully supported
-* liblua 5.2 _some issues_
+* `liblua 5.1` fully supported
+* `liblua 5.2` backport done, but unstable. Has _some issues with memory handling_.
 
-This project is continously tested. Erlualib with liblua 5.1 passes all tests,
-whereas with liblua 5.2 it sometimes segfaults when cleaning up the state (fix
-in progress). Thanks [PropEr] for catching this.
+This project is continuously tested in [Travis][Build Status]. Erlualib with
+`liblua 5.1` passes all tests, whereas with `liblua 5.2` it sometimes segfaults
+while cleaning up the state. Not sure if it is a bug in Lua or Erlualib.
+Investigation in progress. Many thanks to [PropEr] for catching this.
 
-[![Build Status](https://secure.travis-ci.org/Motiejus/erlualib.png)](http://travis-ci.org/Motiejus/erlualib)
+[![Build Status](https://secure.travis-ci.org/Motiejus/erlualib.png)]
 
 [erlualib_examples]: https://github.com/Motiejus/erlualib_examples
 [Erl-Lua]: https://github.com/raycmorgan/erl-lua/
 [Erlang behaviours in Lua]: http://m.jakstys.lt/tech/2012/06/erlang-behaviours-in-lua/
 [PropEr]: http://proper.softlab.ntua.gr/
+[Build Status]: http://travis-ci.org/Motiejus/erlualib
