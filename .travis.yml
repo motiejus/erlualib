@@ -1,3 +1,6 @@
 language: erlang
 otp_release: R15B
 script: "make test"
+before_install:
+    - sudo apt-get update -qq
+    - sudo apt-get install lua5.1
