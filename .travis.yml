@@ -11,4 +11,5 @@ branches:
         - travis
 
 env:
-    - LUA=liblua5.1-0-dev
+    - LUA=liblua5.1-dev
+    - LUA=liblua5.2-dev
