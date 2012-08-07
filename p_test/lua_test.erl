@@ -4,6 +4,8 @@
 
 -define(T, [{numtests, 1000}]).
 
+-define(MAX_STACK_SIZE, 20). % do not put more than that to the stack
+
 oh_prop_test_() ->
     [
         {timeout, 3600, {"boolean", ?prop_check(fun boolean_p/0, [])}},
@@ -23,7 +25,8 @@ int_p() ->
     ).
 
 concat_p() ->
-    ?FORALL(X, list(binary()),
+    ?FORALL(X,
+        ?LET(Size, integer(0, ?MAX_STACK_SIZE), vector(Size, binary())),
         begin
                 {ok, L} = lua:new_state(),
                 [lua:pushlstring(L, B) || B <- X],
