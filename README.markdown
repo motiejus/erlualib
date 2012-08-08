@@ -147,22 +147,36 @@ There is also a simple way to run one off simple Lua code snippets:
 Testing
 =======
 
+![Build Status](https://secure.travis-ci.org/Motiejus/erlualib.png)
+
 To test the whole project and see eUnit and PropEr in action, run:
 
     make test
+
+This project is continuously tested in [Travis-CI][Build Status].
 
 Compatibility
 =============
 
 * `liblua 5.1` fully supported
-* `liblua 5.2` backport done, but unstable. Has _some issues with memory handling_.
+* `liblua 5.2` fully supported
 
-This project is continuously tested in [Travis][Build Status]. Erlualib with
-`liblua 5.1` passes all tests, whereas with `liblua 5.2` it sometimes segfaults
-while cleaning up the state. Not sure if it is a bug in Lua or Erlualib.
-Investigation in progress. Many thanks to [PropEr] for catching this.
+Main difference of `liberlua 5.2` from `liberlua 5.1`: stack size. 5.2 version
+is much more restrictive about initial stack size. I am limiting element size
+to 20 in tests.
 
-[![Build Status](https://secure.travis-ci.org/Motiejus/erlualib.png)]
+How to contribute
+=================
+
+Things are needed most, descending priority:
+
+* Testing and feedback! If you can make something crash, I will love to hear
+  how to do it! Main point of erlualib is to be able to _safely_ run embedded
+Lua code.
+* More sane and understandable examples (key-value server and calculator are
+  okay, could be much better).
+* Specific behaviour `parse_transform` implementations and examples (now most
+  important are `gen_server` and `gen_fsm`).
 
 [erlualib_examples]: https://github.com/Motiejus/erlualib_examples
 [Erl-Lua]: https://github.com/raycmorgan/erl-lua/
