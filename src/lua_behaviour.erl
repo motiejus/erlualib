@@ -85,7 +85,7 @@ make_fun_nodes(L, Funs, ImplementedIn) ->
 make_fun(L, Name, Arity, LuaModABS) ->
     Args = [list_to_atom("Arg"++integer_to_list(I)) || I <- lists:seq(1,Arity)],
     Header = [{var, L, Arg} || Arg <- Args],
-    CallArgs = erl_parse:abstract(Args),
+    CallArgs = call_args(Args, L+1),
     {function,L,Name,Arity,
         [{clause,L,
                 %[{var,8,'Arg1'},{var,8,'Arg2'}],
@@ -100,6 +100,11 @@ make_fun(L, Name, Arity, LuaModABS) ->
                             %    {cons,9,{var,9,'Arg2'},{nil,9}}}
                             CallArgs
                         ]}]}]}.
+
+call_args([], Line) ->
+    {nil, Line};
+call_args([Arg|Args], Line) ->
+    {cons, Line, {var, Line, Arg}, call_args(Args, Line)}.
 
 %% @doc takes -implemented_in(Eval) and returns abstract form for module
 %%
