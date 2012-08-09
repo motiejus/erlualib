@@ -69,7 +69,8 @@ one_call(File, FunName, Args) ->
     {ok, L} = lua:new_state(),
     Src = case file:read_file(File) of
         {ok, Bin} -> Bin;
-        {error, Err} -> error({error_reading_file, File, Err})
+        {error, Err} -> error({{error_reading_file_in, filename:absname("")},
+                    File, Err})
     end,
     ok = lual:dostring(L, Src),
     R = luam:call(L, FunName, Args),
