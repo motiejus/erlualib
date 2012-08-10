@@ -9,7 +9,7 @@
 %%%
 %%% add(Arg1, Arg2) ->
 %%%     luam:one_call(FileName, "add", [Arg1, Arg2]).
-%%% 
+%%%
 %%% FileName is the backing Lua module, in which the module is actually
 %%% implemented. It is defined in -implemented_in(String) attribute.
 %%%
@@ -114,7 +114,7 @@ get_lua_mod_expr(ModAtom, Eval) ->
     % Convert shortcut {priv, FileRelativeToPrivDir} to UglyString
     Mod = atom_to_list(ModAtom),
     LuaModExpr = case Eval of
-        {priv, File} -> 
+        {priv, File} ->
             "filename:join(filename:dirname(filename:dirname(code:which("
             ++ Mod ++ "))), \"priv\") ++ \"" ++ File ++ "\".";
         _ when is_list(Eval) ->

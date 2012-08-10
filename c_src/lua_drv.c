@@ -53,7 +53,7 @@ start(ErlDrvPort port, char *cmd)
   lua_drv_t* retval = (lua_drv_t*) driver_alloc(sizeof(lua_drv_t));
   retval->port = port;
   retval->L = L;
-  
+
   return (ErlDrvData) retval;
 }
 
@@ -73,14 +73,14 @@ process(ErlDrvData handle, ErlIOVec *ev)
   int index = 0;
   int arty, version;
   long command;
-  
+
   ei_decode_version(buf, &index, &version);
   ei_decode_tuple_header(buf, &index, &arty);
   ei_decode_long(buf, &index, &command);
-  
+
   // printf("Command: %ld\n", command);
   // printf("sizeof: int: %ld, long: %ld, long long: %ld\n", sizeof(int), sizeof(long), sizeof(long long));
-  
+
   switch(command) {
   case ERL_LUA_CALL:
     erl_lua_call(driver_data, buf, index);
@@ -154,7 +154,7 @@ process(ErlDrvData handle, ErlIOVec *ev)
   case ERL_LUA_TYPE:
     erl_lua_type(driver_data, buf, index);
     break;
-  
+
   case ERL_LUAL_DOSTRING:
     erl_lual_dostring(driver_data, buf, index);
     break;
@@ -164,7 +164,7 @@ process(ErlDrvData handle, ErlIOVec *ev)
   case ERL_LUAM_MAYBE_ATOM:
     erl_luam_maybe_atom(driver_data, buf, index);
     break;
-  
+
   default:
     erl_lua_no_command(driver_data);
   }

@@ -61,7 +61,7 @@
 -spec new_state() -> {ok, lua()}.
 new_state() ->
     {ok, lua_driver:open()}.
-    
+
 -spec close(lua()) -> true.
 close(L) ->
     lua_driver:close(L).
@@ -83,7 +83,7 @@ getfield(L, global, Name) ->
 getfield(L, Index, Name) ->
     lua_common:command(L, {?ERL_LUA_GETFIELD, Index, Name}),
     lua_common:receive_valued_response().
-    
+
 -spec getglobal(lua(), lua_name()) -> ok.
 getglobal(L, Name) ->
     lua_common:command(L, {?ERL_LUA_GETGLOBAL, Name}),
