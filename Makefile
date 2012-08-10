@@ -4,7 +4,7 @@ REBAR_URL = http://cloud.github.com/downloads/Motiejus/rebar/rebar
 .PHONY: clean compile test
 
 compile: rebar
-	$(REBAR) get-deps compile
+	$(REBAR) get-deps compile xref
 
 clean:
 	$(REBAR) clean
