@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
   /* Fix a silly Lua warning */
-  
+
   void luaL_openlibs (lua_State *L);
 
   /* Commands */
@@ -38,12 +38,12 @@ extern "C" {
   void erl_lua_tonumber(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_settable(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_type(lua_drv_t *driver_data, char *buf, int index);
-  
+
   void erl_lual_dostring (lua_drv_t *driver_data, char *buf, int index);
 
   void erl_luam_multipcall (lua_drv_t *driver_data, char *buf, int index);
   void erl_luam_maybe_atom (lua_drv_t *driver_data, char *buf, int index);
-  
+
   void erl_lua_no_command (lua_drv_t *driver_data);
 
 #ifdef __cplusplus

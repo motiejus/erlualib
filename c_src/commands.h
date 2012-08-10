@@ -1,15 +1,15 @@
 /* General Lua API */
 
 #define ERL_LUA_ALLOC              1
-#define ERL_LUA_ATPANIC            2 
-#define ERL_LUA_CALL               3 
-#define ERL_LUA_CFUNCTION          4 
-#define ERL_LUA_CHECKSTACK         5 
-#define ERL_LUA_CLOSE              6 
-#define ERL_LUA_CONCAT             7 
-#define ERL_LUA_CPCALL             8 
-#define ERL_LUA_CREATETABLE        9 
-#define ERL_LUA_DUMP               10 
+#define ERL_LUA_ATPANIC            2
+#define ERL_LUA_CALL               3
+#define ERL_LUA_CFUNCTION          4
+#define ERL_LUA_CHECKSTACK         5
+#define ERL_LUA_CLOSE              6
+#define ERL_LUA_CONCAT             7
+#define ERL_LUA_CPCALL             8
+#define ERL_LUA_CREATETABLE        9
+#define ERL_LUA_DUMP               10
 #define ERL_LUA_EQUAL              11
 #define ERL_LUA_ERROR              12
 #define ERL_LUA_GC                 13
