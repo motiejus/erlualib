@@ -9,3 +9,10 @@ before_install:
 env:
     - LUA=liblua5.1-dev
     - LUA=liblua5.2-dev
+
+otp_release:
+   - R15B01
+   - R15B
+   - R14B04
+   - R14B03
+   - R14B02
