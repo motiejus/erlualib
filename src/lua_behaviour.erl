@@ -67,7 +67,7 @@ walk_ast(Node, {AstOut, PL}) ->
 get_value(Key, PL) ->
     Ref = make_ref(),
     case proplists:get_value(Key, PL, Ref) of
-        Ref -> error({keyerror, Key, PL});
+        Ref -> erlang:error({keyerror, Key, PL});
         Ret -> Ret
     end.
 
@@ -128,6 +128,6 @@ get_lua_mod_expr(ModAtom, Eval) ->
     {ok, T, _} = erl_scan:string(LuaModExpr),
     case erl_parse:parse_exprs(T) of
         {ok, [M]} -> M;
-        {ok, [_|_]} -> error(one_expression_allowed_in_implemented_in);
-        {error, E} -> error({syntax_error_in_implemented_in_header, E})
+        {ok, [_|_]} -> erlang:error(one_expression_allowed_in_implemented_in);
+        {error, E} -> erlang:error({syntax_error_in_implemented_in_header, E})
     end.

@@ -14,6 +14,6 @@ receive_valued_response() ->
         {throw, Throw} -> throw(Throw);
         Other -> throw({unknown_return, Other})
     after ?STD_TIMEOUT ->
-            error(timeout)
+            erlang:error(timeout)
     end.
 
