@@ -142,10 +142,10 @@ next(L) ->
     lua:settable(L, 1),
     ?assertEqual(1, lua:gettop(L)),
     lua:pushnil(L),
-    ?assertNotEqual(0, lua:next(L, 1)),
+    ?assertEqual(1, lua:next(L, 1)),
     ?assertEqual(<<"2">>, lua:tolstring(L, -1)), lua:remove(L, -1),
     ?assertEqual(<<"du">>, lua:tolstring(L, -1)),
-    ?assertNotEqual(0, lua:next(L, 1)),
+    ?assertEqual(1, lua:next(L, 1)),
     ?assertEqual(<<"1">>, lua:tolstring(L, -1)), lua:remove(L, -1),
     ?assertEqual(<<"vienas">>, lua:tolstring(L, -1)),
     ?assertEqual(0, lua:next(L, 1)).
