@@ -1,5 +1,4 @@
 #include <string.h>
-#include <lauxlib.h>
 
 #include "liberlang.h"
 
@@ -29,7 +28,7 @@ static const struct luaL_Reg liberlang[] = {
     {NULL, NULL}
 };
 
-int luaopen_erlang(lua_State *L) {
+int luaopen_liberlang(lua_State *L) {
     lua_newtable(L);
 
 #if LUA_VERSION_NUM > 501

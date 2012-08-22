@@ -48,7 +48,7 @@ start(ErlDrvPort port, char *cmd)
   L = luaL_newstate();
   luaL_openlibs(L);
 
-  luaopen_erlang(L);
+  luaopen_liberlang(L);
 
   lua_drv_t* retval = (lua_drv_t*) driver_alloc(sizeof(lua_drv_t));
   retval->port = port;
