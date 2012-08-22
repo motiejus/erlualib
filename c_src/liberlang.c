@@ -18,7 +18,13 @@ static int e_atom(lua_State *L) {
 
     userdata = (char*)lua_newuserdata(L, len+1);
     memcpy(userdata, str, len+1);
-    luaL_getmetatable(L, "erlang.t_atom");
+
+    lua_getglobal(L, "erlang");
+    lua_getfield(L, -1, "t_atom");
+    lua_setmetatable(L, 2);
+    lua_pop(L, 1);
+    return 1;
+}
     lua_setmetatable(L, -2);
     return 1;
 }
@@ -36,10 +42,12 @@ int luaopen_liberlang(lua_State *L) {
 #else
     luaL_register(L, NULL, liberlang);
 #endif
+
+    /* Create metatable "erlang.t_atom" */
+    lua_pushstring(L, "t_atom");
+    lua_newtable(L);
+    lua_settable(L, -3);
+
     lua_setglobal(L, "erlang");
-
-    luaL_newmetatable(L, "erlang.t_atom");
-    lua_pop(L, 1);
-
-    return 1;
+    return 0;
 }

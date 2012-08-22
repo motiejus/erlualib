@@ -451,7 +451,11 @@ erl_luam_maybe_atom(lua_drv_t *driver_data, char *buf, int index)
   char *atom;
   ei_decode_long(buf, &index, &i);
 
-  is_atom = luam_testudata(driver_data->L, i, "erlang.t_atom") != NULL;
+  lua_getglobal(driver_data->L, "erlang");
+  lua_getfield(driver_data->L, -1, "t_atom");
+  lua_getmetatable(driver_data->L, -3);
+  is_atom = lua_rawequal(driver_data->L, -1, -2);
+  lua_pop(driver_data->L, 3);
 
   if (is_atom) {
       atom = (char*)lua_touserdata(driver_data->L, i);
