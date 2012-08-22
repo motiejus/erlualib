@@ -166,3 +166,11 @@ a2b(Atom) when is_atom(Atom) ->
 maybe_atom(L, N) ->
     lua_common:command(L, {?ERL_LUAM_MAYBE_ATOM, N}),
     lua_common:receive_valued_response().
+
+%% @doc Check whether thing on index is a tuple
+%-spec check_tuple(lua:lua(), lua:index()) -> boolean().
+%check_tuple(L, N) ->
+%    case lua:getmetatable(L, N) of
+%        0 -> false; % value does not have a metatable
+%        _ ->
+%            lua:getglobal(L, "erlang.t_tuple")

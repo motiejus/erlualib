@@ -26,8 +26,26 @@ static int e_atom(lua_State *L) {
     return 1;
 }
 
+/*
+ * Take table and assign it to "t_tuple" metatable
+ */
+static int e_tuple(lua_State *L) {
+    int n = lua_gettop(L);
+    if (n != 1) {
+        luaL_error(L, "Invalid number of arguments. Got: %d, expected: 1", n);
+    }
+    luaL_checktype(L, 1, LUA_TTABLE);
+
+    lua_getglobal(L, "erlang");
+    lua_getfield(L, -1, "t_tuple");
+    lua_setmetatable(L, 2);
+    lua_pop(L, 1); /* 'erlang' table */
+    return 1;
+}
+
 static const struct luaL_Reg liberlang[] = {
     {"atom", e_atom},
+    {"tuple", e_tuple},
     {NULL, NULL}
 };
 
@@ -42,6 +60,11 @@ int luaopen_liberlang(lua_State *L) {
 
     /* Create metatable "erlang.t_atom" */
     lua_pushstring(L, "t_atom");
+    lua_newtable(L);
+    lua_settable(L, -3);
+
+    /* Create metatable "erlang.t_tuple" */
+    lua_pushstring(L, "t_tuple");
     lua_newtable(L);
     lua_settable(L, -3);
 
