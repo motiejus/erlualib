@@ -25,9 +25,6 @@ static int e_atom(lua_State *L) {
     lua_pop(L, 1);
     return 1;
 }
-    lua_setmetatable(L, -2);
-    return 1;
-}
 
 static const struct luaL_Reg liberlang[] = {
     {"atom", e_atom},
