@@ -62,6 +62,7 @@ oh_test_() ->
         {"createtable", ?_test(createtable(ns()))},
         {"settable", ?_test(settable(ns()))},
         {"gettable", ?_test(gettable(ns()))},
+        {"rawequal", ?_test(rawequal(ns()))},
         {"remove", ?_test(remove(ns()))},
         {"setfield, getfield", ?_test(set_get_field(ns()))},
         {"concat", ?_test(concat(ns()))},
@@ -93,6 +94,14 @@ gettable(L) ->
     lua:pushnumber(L, 2),
     lua:gettable(L, -2), % push t[2] to top
     ?assertEqual(3, lua:tonumber(L, -1)).
+
+rawequal(L) ->
+    lua:pushnumber(L, 1),
+    lua:pushnumber(L, 1),
+    lua:pushnumber(L, 2),
+    ?assertEqual(true, lua:rawequal(L, 1, 2)),
+    ?assertEqual(false, lua:rawequal(L, 2, 3)),
+    ?assertEqual(false, lua:rawequal(L, 10, 11)).
 
 remove(L) ->
     lua:pushnumber(L, 1),

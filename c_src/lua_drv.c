@@ -127,6 +127,9 @@ process(ErlDrvData handle, ErlIOVec *ev)
   case ERL_LUA_PUSHNUMBER:
     erl_lua_pushnumber(driver_data, buf, index);
     break;
+  case ERL_LUA_RAWEQUAL:
+    erl_lua_rawequal(driver_data, buf, index);
+    break;
   case ERL_LUA_REMOVE:
     erl_lua_remove(driver_data, buf, index);
     break;

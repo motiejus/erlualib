@@ -17,6 +17,7 @@
          pushlstring/2,
          pushnil/1,
          pushnumber/2,
+         rawequal/3,
          remove/2,
          setfield/3,
          setglobal/2,
@@ -142,6 +143,11 @@ pushnil(L) ->
 -spec pushnumber(lua(), number()) -> ok.
 pushnumber(L, Num) when is_number(Num) ->
     lua_common:command(L, {?ERL_LUA_PUSHNUMBER, Num}),
+    lua_common:receive_valued_response().
+
+-spec rawequal(lua(), index(), index()) -> boolean().
+rawequal(L, Index1, Index2) ->
+    lua_common:command(L, {?ERL_LUA_RAWEQUAL, Index1, Index2}),
     lua_common:receive_valued_response().
 
 -spec remove(lua(), index()) -> ok.

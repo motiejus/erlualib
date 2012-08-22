@@ -13,6 +13,7 @@ static void reply_ok(lua_drv_t *driver_data);
 static void reply_throw(lua_drv_t *driver_data, const char*);
 static char* decode_string(const char *buf, int *index);
 static char* decode_binary(const char *buf, int *index, int *len);
+static void reply_boolean(lua_drv_t *driver_data, int res);
 
 void
 erl_lua_call(lua_drv_t *driver_data, char *buf, int index)
@@ -222,6 +223,20 @@ erl_lua_pushnumber(lua_drv_t *driver_data, char *buf, int index)
 }
 
 void
+erl_lua_rawequal(lua_drv_t *driver_data, char *buf, int index)
+{
+  int ret;
+  long index1, index2;
+
+  ei_decode_long(buf, &index, &index1);
+  ei_decode_long(buf, &index, &index2);
+
+  ret = lua_rawequal(driver_data->L, index1, index2);
+
+  reply_boolean(driver_data, ret);
+}
+
+void
 erl_lua_remove(lua_drv_t *driver_data, char *buf, int index)
 {
   long i;
@@ -271,12 +286,7 @@ erl_lua_toboolean(lua_drv_t *driver_data, char *buf, int index)
 
   res = lua_toboolean(driver_data->L, i);
 
-  ErlDrvTermData spec[] = {
-        ERL_DRV_ATOM,   ATOM_OK,
-        ERL_DRV_ATOM, driver_mk_atom(res ? "true" : "false"),
-        ERL_DRV_TUPLE,  2
-  };
-  driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
+  reply_boolean(driver_data, res);
 }
 
 void
@@ -514,4 +524,14 @@ decode_binary(const char *buf, int *index, int *len)
   ei_decode_binary(buf, index, str, &length);
   assert((int)length == *len);
   return str;
+}
+
+static void
+reply_boolean(lua_drv_t *driver_data, int res) {
+    ErlDrvTermData spec[] = {
+        ERL_DRV_ATOM,   ATOM_OK,
+        ERL_DRV_ATOM, driver_mk_atom(res ? "true" : "false"),
+        ERL_DRV_TUPLE,  2
+    };
+    driver_output_term(driver_data->port, spec, sizeof(spec) / sizeof(spec[0]));
 }

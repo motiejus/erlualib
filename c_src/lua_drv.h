@@ -29,6 +29,7 @@ extern "C" {
   void erl_lua_pushlstring(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_pushnil(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_pushnumber(lua_drv_t *driver_data, char *buf, int index);
+  void erl_lua_rawequal(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_remove(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_setfield(lua_drv_t *driver_data, char *buf, int index);
   void erl_lua_setglobal(lua_drv_t *driver_data, char *buf, int index);

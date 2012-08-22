@@ -1,6 +1,6 @@
 #include <string.h>
+#include <lauxlib.h>
 
-#include "lauxlib.h"
 #include "liberlang.h"
 
 /* Take the String on stack and convert it to atom
