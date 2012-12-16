@@ -66,16 +66,22 @@ call(L, FunName, Args) ->
 %% 5. Return the result of luam:call
 -spec one_call(file:name(),string(),list(lua:arg())) -> lua:ret() | no_return().
 one_call(File, FunName, Args) ->
-    {ok, L} = lua:new_state(),
+	case get(lua_state) of
+		undefined ->
+		    {ok, L} = lua:new_state(),
+		    put(lua_state, L);
+		L -> L
+	end,
     Src = case file:read_file(File) of
         {ok, Bin} -> Bin;
         {error, Err} -> erlang:error({{error_reading_file_in, filename:absname("")},
                     File, Err})
     end,
     ok = lual:dostring(L, Src),
-    R = luam:call(L, FunName, Args),
-    lua:close(L),
-    R.
+    luam:call(L, FunName, Args).
+%%     R = luam:call(L, FunName, Args),
+%%     lua:close(L),
+%%     R.
 
 %% @doc Push arbitrary variable on stack
 -spec pushterm(lua:lua(), lua:arg())    -> ok.
