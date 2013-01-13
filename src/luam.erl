@@ -87,6 +87,7 @@ one_call(File, FunName, Args) ->
 -spec pushterm(lua:lua(), lua:arg())    -> ok.
 pushterm(L, Arg) when is_pid(Arg)       -> lua:pushnil(L); % TODO: UNSUPPORTED
 pushterm(L, Arg) when is_reference(Arg) -> lua:pushnil(L); % TODO: UNSUPPORTED
+pushterm(L, Arg) when is_port(Arg)      -> lua:pushnil(L); % TODO: UNSUPPORTED
 pushterm(L, nil)                        -> lua:pushnil(L);
 pushterm(L, Arg) when is_boolean(Arg)   -> lua:pushboolean(L, Arg);
 pushterm(L, Arg) when is_atom(Arg)      -> lua:pushlstring(L, a2b(Arg));
@@ -96,14 +97,18 @@ pushterm(L, Args) when is_tuple(Args)   ->
     Proplist = lists:zip(lists:seq(1, size(Args)), tuple_to_list(Args)),
     pushterm(L, Proplist);
 pushterm(L, Args) when is_list(Args) ->
-    lua:createtable(L, length(Args), 0),
-    TPos = lua:gettop(L),
-    Fun = fun({K, V}) ->
-            pushterm(L, K),
-            pushterm(L, V),
-            lua:settable(L, TPos)
-    end,
-    lists:foreach(Fun, Args).
+    case is_string(Args) of
+        true -> lua:pushlstring(L, unicode:characters_to_binary(Args));
+        false ->
+            lua:createtable(L, length(Args), 0),
+            TPos = lua:gettop(L),
+            Fun = fun({K, V}) ->
+                    pushterm(L, K),
+                    pushterm(L, V),
+                    lua:settable(L, TPos)
+            end,
+            lists:foreach(Fun, Args)
+    end.
 
 %% @doc Pop N results from the stack and return result tuple. [-N, +0]
 -spec pop_results(lua:lua(), pos_integer()) -> tuple().
@@ -172,3 +177,7 @@ a2b(Atom) when is_atom(Atom) ->
 maybe_atom(L, N) ->
     lua_common:command(L, {?ERL_LUAM_MAYBE_ATOM, N}),
     lua_common:receive_valued_response().
+
+is_string([X]) -> is_integer(X) andalso X>=0;
+is_string([X|T]) -> is_integer(X) andalso X>=0 andalso is_string(T);
+is_string(_) -> false.
