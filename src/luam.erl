@@ -133,7 +133,7 @@ toterm(L, N) ->
         string -> lua:tolstring(L, N);
         user_data ->
             case maybe_atom(L, N) of
-                {ok, Atom} -> Atom;
+                {lua_ok, Atom} -> Atom;
                 _ -> erlang:error(badarg)
             end;
         table ->
@@ -173,7 +173,7 @@ a2b(Atom) when is_atom(Atom) ->
     list_to_binary(atom_to_list(Atom)).
 
 %% @doc Return atom() if value on N is atom; false otherwise
--spec maybe_atom(lua:lua(), lua:index()) -> {ok, atom()} | false.
+-spec maybe_atom(lua:lua(), lua:index()) -> {lua_ok, atom()} | false.
 maybe_atom(L, N) ->
     lua_common:command(L, {?ERL_LUAM_MAYBE_ATOM, N}),
     lua_common:receive_valued_response().
