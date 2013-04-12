@@ -100,14 +100,18 @@ pushterm(L, Args) when is_list(Args) ->
     case is_string(Args) of
         true -> lua:pushlstring(L, unicode:characters_to_binary(Args));
         false ->
-            lua:createtable(L, length(Args), 0),
+            case is_proplist(Args) of
+                true -> NewArgs = Args;
+                false -> NewArgs = lists:zip(lists:seq(1, length(Args)), Args)
+            end,
+            lua:createtable(L, length(NewArgs), 0),
             TPos = lua:gettop(L),
             Fun = fun({K, V}) ->
                     pushterm(L, K),
                     pushterm(L, V),
                     lua:settable(L, TPos)
             end,
-            lists:foreach(Fun, Args)
+            lists:foreach(Fun, NewArgs)
     end.
 
 %% @doc Pop N results from the stack and return result tuple. [-N, +0]
@@ -178,6 +182,10 @@ maybe_atom(L, N) ->
     lua_common:command(L, {?ERL_LUAM_MAYBE_ATOM, N}),
     lua_common:receive_valued_response().
 
-is_string([X]) -> is_integer(X) andalso X>=0;
-is_string([X|T]) -> is_integer(X) andalso X>=0 andalso is_string(T);
-is_string(_) -> false.
+is_string([]) -> false;
+is_string(X) -> io_lib:printable_unicode_list(X).
+
+is_proplist([]) -> true;
+is_proplist({_K, _V}) -> true;
+is_proplist([X|T]) -> is_proplist(X) andalso is_proplist(T);
+is_proplist(_) -> false.
