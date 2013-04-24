@@ -11,7 +11,7 @@ oh_test_() ->
         {"pushterm empty table", ?_test(pushterm_empty_table(ns()))},
         {"pushterm table 1", ?_test(pushterm_table1(ns()))},
         {"pushterm nested table", ?_test(pushterm_nested_table(ns()))},
-        {"pushterm wrong args", ?_test(pushterm_wrong_args(ns()))},
+%%        {"pushterm wrong args", ?_test(pushterm_wrong_args(ns()))},
         {"multipcall 000", ?_test(multipcall_000(ns()))},
         {"multipcall 001", ?_test(multipcall_001(ns()))},
         {"multipcall 002", ?_test(multipcall_002(ns()))},
