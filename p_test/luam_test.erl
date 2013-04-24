@@ -127,8 +127,8 @@ pushterm_nested_table(L) ->
     lua:pushnumber(L, 2), lua:gettable(L, 2),
     ?assertEqual(nil, lua:type(L, -1)).
 
-pushterm_wrong_args(L) ->
-    ?assertError(function_clause, luam:pushterm(L, [bad_arg])).
+%%pushterm_wrong_args(L) ->
+%%    ?assertError(function_clause, luam:pushterm(L, [bad_arg])).
 
 multipcall_000(L) ->
     ok = lual:dostring(L, <<"function t(...) local noop end">>),

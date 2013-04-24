@@ -43,7 +43,7 @@
 
 -include("lua_api.hrl").
 
--export([one_call/3, call/3, multipcall/2, maybe_atom/2, pushterm/2]).
+-export([one_call/3, call/3, multipcall/2, maybe_atom/2, pushterm/2, reload/0]).
 -export([fold/4]).
 
 
@@ -66,22 +66,16 @@ call(L, FunName, Args) ->
 %% 5. Return the result of luam:call
 -spec one_call(file:name(),string(),list(lua:arg())) -> lua:ret() | no_return().
 one_call(File, FunName, Args) ->
-	case get(lua_state) of
-		undefined ->
-		    {ok, L} = lua:new_state(),
-		    put(lua_state, L);
-		L -> L
-	end,
-    Src = case file:read_file(File) of
-        {ok, Bin} -> Bin;
-        {error, Err} -> erlang:error({{error_reading_file_in, filename:absname("")},
-                    File, Err})
+    State = case get(lua_state) of
+        undefined ->
+            {ok, L} = lua:new_state(),
+            put(lua_file, File),
+            put(lua_state, L),
+            reload(),
+            L;
+        L -> L
     end,
-    ok = lual:dostring(L, Src),
-    luam:call(L, FunName, Args).
-%%     R = luam:call(L, FunName, Args),
-%%     lua:close(L),
-%%     R.
+    luam:call(State, FunName, Args).
 
 %% @doc Push arbitrary variable on stack
 -spec pushterm(lua:lua(), lua:arg())    -> ok.
@@ -97,9 +91,9 @@ pushterm(L, Args) when is_tuple(Args)   ->
     Proplist = lists:zip(lists:seq(1, size(Args)), tuple_to_list(Args)),
     pushterm(L, Proplist);
 pushterm(L, Args) when is_list(Args) ->
-    case is_proplist(Args) of
-        true -> NewArgs = Args;
-        false -> NewArgs = lists:zip(lists:seq(1, length(Args)), Args)
+    NewArgs = case is_proplist(Args) of
+        true -> Args;
+        false -> lists:zip(lists:seq(1, length(Args)), Args)
     end,
     lua:createtable(L, length(NewArgs), 0),
     TPos = lua:gettop(L),
@@ -180,6 +174,17 @@ maybe_atom(L, N) ->
 
 %is_string([]) -> false;
 %is_string(X) -> io_lib:printable_unicode_list(X).
+
+-spec reload() -> ok.
+reload() -> 
+    L = get(lua_state),
+    File = get(lua_file),
+    Src = case file:read_file(File) of
+        {ok, Bin} -> Bin;
+        {error, Err} -> erlang:error({{error_reading_file_in, filename:absname("")},
+                    File, Err})
+    end,
+    ok = lual:dostring(L, Src).
 
 is_proplist([]) -> true;
 is_proplist({_K, _V}) -> true;

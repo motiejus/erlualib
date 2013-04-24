@@ -11,7 +11,7 @@ put_atom_test() ->
     lua:call(L, 1, 1),
     ?assertEqual(1, lua:gettop(L)),
     ?assertEqual(user_data, lua:type(L, 1)),
-    ?assertEqual({ok, a1}, luam:maybe_atom(L, 1)).
+    ?assertEqual({lua_ok, a1}, luam:maybe_atom(L, 1)).
 
 luam_call_with_atom_test() ->
     {ok, L} = lua:new_state(),
