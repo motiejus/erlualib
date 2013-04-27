@@ -43,7 +43,7 @@
 
 -include("lua_api.hrl").
 
--export([one_call/3, call/3, multipcall/2, maybe_atom/2, pushterm/2, reload/0]).
+-export([one_call/3, call/3, multipcall/2, maybe_atom/2, pushterm/2]).
 -export([fold/4]).
 
 
@@ -69,12 +69,16 @@ one_call(File, FunName, Args) ->
     State = case get(lua_state) of
         undefined ->
             {ok, L} = lua:new_state(),
-            put(lua_file, File),
             put(lua_state, L),
-            reload(),
             L;
         L -> L
     end,
+    Src = case file:read_file(File) of
+        {ok, Bin} -> Bin;
+        {error, Err} -> erlang:error({{error_reading_file_in, filename:absname("")},
+                    File, Err})
+    end,
+    ok = lual:dostring(State, Src),
     luam:call(State, FunName, Args).
 
 %% @doc Push arbitrary variable on stack
@@ -174,17 +178,6 @@ maybe_atom(L, N) ->
 
 %is_string([]) -> false;
 %is_string(X) -> io_lib:printable_unicode_list(X).
-
--spec reload() -> ok.
-reload() -> 
-    L = get(lua_state),
-    File = get(lua_file),
-    Src = case file:read_file(File) of
-        {ok, Bin} -> Bin;
-        {error, Err} -> erlang:error({{error_reading_file_in, filename:absname("")},
-                    File, Err})
-    end,
-    ok = lual:dostring(L, Src).
 
 is_proplist([]) -> true;
 is_proplist({_K, _V}) -> true;
