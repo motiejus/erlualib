@@ -42,6 +42,7 @@
 -module(luam).
 
 -include("lua_api.hrl").
+-include_lib("kernel/include/file.hrl").
 
 -export([one_call/3, call/3, multipcall/2, maybe_atom/2, pushterm/2]).
 -export([fold/4]).
@@ -73,12 +74,19 @@ one_call(File, FunName, Args) ->
             L;
         L -> L
     end,
-    Src = case file:read_file(File) of
-        {ok, Bin} -> Bin;
-        {error, Err} -> erlang:error({{error_reading_file_in, filename:absname("")},
-                    File, Err})
+    {ok, #file_info{mtime=Mtime}}=file:read_file_info(File),
+    LuaMtime = get(lua_mtime), 
+    if 
+        LuaMtime =/= Mtime ->
+            Src = case file:read_file(File) of
+                {ok, Bin} -> Bin;
+                {error, Err} -> erlang:error({{error_reading_file_in, filename:absname("")},
+                            File, Err})
+            end,
+            ok = lual:dostring(State, Src),
+            put(lua_mtime, Mtime);
+        true -> do_nothing
     end,
-    ok = lual:dostring(State, Src),
     luam:call(State, FunName, Args).
 
 %% @doc Push arbitrary variable on stack
