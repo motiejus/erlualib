@@ -42,6 +42,7 @@
 -module(luam).
 
 -include("lua_api.hrl").
+-include_lib("kernel/include/file.hrl").
 
 -export([one_call/3, call/3, multipcall/2, maybe_atom/2, pushterm/2]).
 -export([fold/4]).
@@ -66,21 +67,33 @@ call(L, FunName, Args) ->
 %% 5. Return the result of luam:call
 -spec one_call(file:name(),string(),list(lua:arg())) -> lua:ret() | no_return().
 one_call(File, FunName, Args) ->
-    {ok, L} = lua:new_state(),
-    Src = case file:read_file(File) of
-        {ok, Bin} -> Bin;
-        {error, Err} -> erlang:error({{error_reading_file_in, filename:absname("")},
-                    File, Err})
+    State = case get(lua_state) of
+        undefined ->
+            {ok, L} = lua:new_state(),
+            put(lua_state, L),
+            L;
+        L -> L
     end,
-    ok = lual:dostring(L, Src),
-    R = luam:call(L, FunName, Args),
-    lua:close(L),
-    R.
+    {ok, #file_info{mtime=Mtime}}=file:read_file_info(File),
+    LuaMtime = get(lua_mtime), 
+    if 
+        LuaMtime =/= Mtime ->
+            Src = case file:read_file(File) of
+                {ok, Bin} -> Bin;
+                {error, Err} -> erlang:error({{error_reading_file_in, filename:absname("")},
+                            File, Err})
+            end,
+            ok = lual:dostring(State, Src),
+            put(lua_mtime, Mtime);
+        true -> do_nothing
+    end,
+    luam:call(State, FunName, Args).
 
 %% @doc Push arbitrary variable on stack
 -spec pushterm(lua:lua(), lua:arg())    -> ok.
 pushterm(L, Arg) when is_pid(Arg)       -> lua:pushnil(L); % TODO: UNSUPPORTED
 pushterm(L, Arg) when is_reference(Arg) -> lua:pushnil(L); % TODO: UNSUPPORTED
+pushterm(L, Arg) when is_port(Arg)      -> lua:pushnil(L); % TODO: UNSUPPORTED
 pushterm(L, nil)                        -> lua:pushnil(L);
 pushterm(L, Arg) when is_boolean(Arg)   -> lua:pushboolean(L, Arg);
 pushterm(L, Arg) when is_atom(Arg)      -> lua:pushlstring(L, a2b(Arg));
@@ -90,14 +103,18 @@ pushterm(L, Args) when is_tuple(Args)   ->
     Proplist = lists:zip(lists:seq(1, size(Args)), tuple_to_list(Args)),
     pushterm(L, Proplist);
 pushterm(L, Args) when is_list(Args) ->
-    lua:createtable(L, length(Args), 0),
+    NewArgs = case is_proplist(Args) of
+        true -> Args;
+        false -> lists:zip(lists:seq(1, length(Args)), Args)
+    end,
+    lua:createtable(L, length(NewArgs), 0),
     TPos = lua:gettop(L),
     Fun = fun({K, V}) ->
             pushterm(L, K),
             pushterm(L, V),
             lua:settable(L, TPos)
     end,
-    lists:foreach(Fun, Args).
+    lists:foreach(Fun, NewArgs).
 
 %% @doc Pop N results from the stack and return result tuple. [-N, +0]
 -spec pop_results(lua:lua(), pos_integer()) -> tuple().
@@ -122,7 +139,7 @@ toterm(L, N) ->
         string -> lua:tolstring(L, N);
         user_data ->
             case maybe_atom(L, N) of
-                {ok, Atom} -> Atom;
+                {lua_ok, Atom} -> Atom;
                 _ -> erlang:error(badarg)
             end;
         table ->
@@ -162,7 +179,15 @@ a2b(Atom) when is_atom(Atom) ->
     list_to_binary(atom_to_list(Atom)).
 
 %% @doc Return atom() if value on N is atom; false otherwise
--spec maybe_atom(lua:lua(), lua:index()) -> {ok, atom()} | false.
+-spec maybe_atom(lua:lua(), lua:index()) -> {lua_ok, atom()} | false.
 maybe_atom(L, N) ->
     lua_common:command(L, {?ERL_LUAM_MAYBE_ATOM, N}),
     lua_common:receive_valued_response().
+
+%is_string([]) -> false;
+%is_string(X) -> io_lib:printable_unicode_list(X).
+
+is_proplist([]) -> true;
+is_proplist({_K, _V}) -> true;
+is_proplist([X|T]) -> is_proplist(X) andalso is_proplist(T);
+is_proplist(_) -> false.

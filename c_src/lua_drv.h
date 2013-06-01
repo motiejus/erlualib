@@ -1,5 +1,6 @@
 typedef struct _lua_drv_t {
   ErlDrvPort port;
+  ErlDrvTermData drvport;
   lua_State *L;
 } lua_drv_t;
 

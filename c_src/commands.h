@@ -141,5 +141,5 @@
 #define ERL_LUAM_MULTIPCALL        200
 #define ERL_LUAM_MAYBE_ATOM        201
 
-#define ATOM_OK driver_mk_atom("ok")
-#define ATOM_THROW driver_mk_atom("throw")
+#define ATOM_OK driver_mk_atom("lua_ok")
+#define ATOM_THROW driver_mk_atom("lua_throw")
