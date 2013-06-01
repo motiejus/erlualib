@@ -52,6 +52,7 @@ start(ErlDrvPort port, char *cmd)
 
   lua_drv_t* retval = (lua_drv_t*) driver_alloc(sizeof(lua_drv_t));
   retval->port = port;
+  retval->drvport = driver_mk_port(port);
   retval->L = L;
 
   return (ErlDrvData) retval;
